@@ -23,7 +23,7 @@ namespace DirtyJvsBrain
                     var f = _recievedData.Dequeue();
                     if (f == 0xE0)
                     {
-                        int count = 0;
+                        var count = 0;
                         byte size = 0;
                         while (true)
                         {
@@ -54,21 +54,15 @@ namespace DirtyJvsBrain
                             }
                         }
                     }
-                    // TODO: REMOVE
-                    //else if (f == 0xD0)
-                    //{
-                    //    // TEST REMOVE
-                    //    int b = 0;
-                    //}
-                    //else
-                    //{
-                    //    // TEST REMOVE
-                    //    int b = 0;
-                    //}
                 }
                 Thread.Sleep(10);
             }
         }
+
+        /// <summary>
+        /// Listen the serial port.
+        /// </summary>
+        /// <param name="port">Port name.</param>
         public void ListenSerial(string port)
         {
             _port = new SerialPort(port)

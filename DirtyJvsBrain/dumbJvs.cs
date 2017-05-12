@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DirtyJvsBrain
 {
@@ -15,6 +13,13 @@ namespace DirtyJvsBrain
         private const byte JVS_ADDR_MASTER = 0x00;
         private const byte JVS_COMMAND_REV = 0x13;
 
+        /// <summary>
+        /// Calculates JVS checksum.
+        /// </summary>
+        /// <param name="dest">Destination node.</param>
+        /// <param name="bytes">The data.</param>
+        /// <param name="length">Length</param>
+        /// <returns></returns>
         private static byte CalcChecksum(int dest, byte[] bytes, int length)
         {
             var csum = dest + length + 1;
@@ -25,82 +30,102 @@ namespace DirtyJvsBrain
             return (byte)csum;
         }
 
+        /// <summary>
+        /// Gets special bits for Digital.
+        /// </summary>
+        /// <returns>Bits for digital.</returns>
         private static byte GetSpecialBits()
         {
             byte result = 00;
-            if (InputCode.Test)
+            if (InputCode.PlayerOneButtons.Test || InputCode.PlayerTwoButtons.Test)
                 result |= 0x80;
             return result;
         }
 
+        /// <summary>
+        /// Gets Player 1 switch data.
+        /// </summary>
+        /// <returns>Bits for player 1 switch data.</returns>
         private static byte GetPlayer1Controls()
         {
             byte result = 0;
-            if (InputCode.Start1)
+            if (InputCode.PlayerOneButtons.Start)
                 result |= 0x80;
-            if (InputCode.Service1)
+            if (InputCode.PlayerOneButtons.Service)
                 result |= 0x40;
-            if (InputCode.Player1Up)
+            if (InputCode.PlayerOneButtons.Up)
                 result |= 0x20;
-            if (InputCode.Player1Down)
+            if (InputCode.PlayerOneButtons.Down)
                 result |= 0x10;
-            if (InputCode.Player1Left)
+            if (InputCode.PlayerOneButtons.Left)
                 result |= 0x08;
-            if (InputCode.Player1Right)
+            if (InputCode.PlayerOneButtons.Right)
                 result |= 0x04;
-            if (InputCode.Player1Button1)
+            if (InputCode.PlayerOneButtons.Button1)
                 result |= 0x02;
-            if (InputCode.Player1Button2)
+            if (InputCode.PlayerOneButtons.Button2)
                 result |= 0x01;
             return result;
         }
 
+        /// <summary>
+        /// Gets Player 1 extended switch data.
+        /// </summary>
+        /// <returns>Bits for player 1 extended switch data.</returns>
         private static byte GetPlayer1ControlsExt()
         {
             byte result = 0;
-            if (InputCode.Player1Button3)
+            if (InputCode.PlayerOneButtons.Button3)
                 result |= 0x80;
-            if (InputCode.Player1Button4)
+            if (InputCode.PlayerOneButtons.Button4)
                 result |= 0x40;
-            if (InputCode.Player1Button5)
+            if (InputCode.PlayerOneButtons.Button5)
                 result |= 0x20;
-            if (InputCode.Player1Button6)
+            if (InputCode.PlayerOneButtons.Button6)
                 result |= 0x10;
             return result;
         }
 
+        /// <summary>
+        /// Gets Player 2 switch data.
+        /// </summary>
+        /// <returns>Bits for player 2 switch data.</returns>
         private static byte GetPlayer2Controls()
         {
             byte result = 0;
-            if (InputCode.Start2)
+            if (InputCode.PlayerTwoButtons.Start)
                 result |= 0x80;
-            if (InputCode.Service2)
+            if (InputCode.PlayerTwoButtons.Service)
                 result |= 0x40;
-            if (InputCode.Player2Up || InputCode.ShiftUp)
+            if (InputCode.PlayerTwoButtons.Up || InputCode.ShiftUp)
                 result |= 0x20;
-            if (InputCode.Player2Down || InputCode.ShiftDown)
+            if (InputCode.PlayerTwoButtons.Down || InputCode.ShiftDown)
                 result |= 0x10;
-            if (InputCode.Player2Left)
+            if (InputCode.PlayerTwoButtons.Left)
                 result |= 0x08;
-            if (InputCode.Player2Right)
+            if (InputCode.PlayerTwoButtons.Right)
                 result |= 0x04;
-            if (InputCode.Player2Button1)
+            if (InputCode.PlayerTwoButtons.Button1)
                 result |= 0x02;
-            if (InputCode.Player2Button2)
+            if (InputCode.PlayerTwoButtons.Button2)
                 result |= 0x01;
             return result;
         }
 
+        /// <summary>
+        /// Gets Player 2 extended switch data.
+        /// </summary>
+        /// <returns>Bits for player 2 extended switch data.</returns>
         private static byte GetPlayer2ControlsExt()
         {
             byte result = 0;
-            if (InputCode.Player2Button3)
+            if (InputCode.PlayerTwoButtons.Button3)
                 result |= 0x80;
-            if (InputCode.Player2Button4)
+            if (InputCode.PlayerTwoButtons.Button4)
                 result |= 0x40;
-            if (InputCode.Player2Button5)
+            if (InputCode.PlayerTwoButtons.Button5)
                 result |= 0x20;
-            if (InputCode.Player2Button6)
+            if (InputCode.PlayerTwoButtons.Button6)
                 result |= 0x10;
             return result;
         }
@@ -118,6 +143,7 @@ namespace DirtyJvsBrain
             var replyBytes = new List<byte>();
             if (data.Length <= 3)
                 return replyBytes.ToArray();
+            // TODO: REWRITE TO UNDERSTAND MULTIPLE COMMANDS IN ONE, INSTEAD OF HARDCODED WITH LENGTH. Good for MKDX etc.
             switch (data[3])
             {
                 // E0FF03F0D9CB
