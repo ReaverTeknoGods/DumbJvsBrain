@@ -1,0 +1,24 @@
+﻿<Window x:Class="DumbJVSManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DumbJVSManager"
+        mc:Ignorable="d" WindowStartupLocation="CenterScreen"
+        Title="Dumb JVS Manager 0.3" Height="270" Width="640" Loaded="Window_Loaded" Closing="MainWindow_OnClosing">
+    <Grid>
+        <StackPanel>
+            <Image Source="Resources/teknogods3___.png"/>
+            <TextBlock HorizontalAlignment="Center" Text="Game launcher"/>
+            <ComboBox Name="GameListComboBox" SelectedIndex="0" HorizontalContentAlignment="Center">
+                <ComboBoxItem Content="Melty Blood Actress Again Current Code"/>
+                <ComboBoxItem Content="Sega Racing Classic"/>
+                <ComboBoxItem Content="Virtua Tennis 4"/>
+            </ComboBox>
+            <CheckBox Name="ChkTestMenu" Content="Test menu" Width="80"/>
+            <Button Click="BtnStartGame" Content="Start Game" Width="Auto"/>
+            <Button Click="BtnSettings" Content="Settings"/>
+            <Button Click="BtnQuit" Content="Quit"/>
+        </StackPanel>
+    </Grid>
+</Window>

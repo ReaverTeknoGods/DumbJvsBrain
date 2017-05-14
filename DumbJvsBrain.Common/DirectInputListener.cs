@@ -2,44 +2,31 @@
 using System.Linq;
 using SharpDX.DirectInput;
 
-namespace DirtyJvsBrain
+namespace DumbJvsBrain.Common
 {
     public class DirectInputListener
     {
         /// <summary>
-        /// Lists joysticks and gamepads using DirectInput.
+        /// This is so we can easily kill the thread.
         /// </summary>
-        public void ListJoysticks()
-        {
-            var joystickFound = false;
-            var directInput = new DirectInput();
-            foreach (var deviceInstance in directInput.GetDevices().Where(x => x.Type == DeviceType.Gamepad || x.Type == DeviceType.Joystick).ToList())
-            {
-                joystickFound = true;
-                Console.WriteLine("---------------Joystick Data---------------");
-                Console.WriteLine($"GUID: {deviceInstance.InstanceGuid}");
-                Console.WriteLine($"InstanceName: {ExtractWithoutZeroes(deviceInstance.InstanceName)}");
-                Console.WriteLine($"ProductName: {ExtractWithoutZeroes(deviceInstance.ProductName)}");
-                Console.WriteLine("-------------------------------------------");
-            }
+        public bool KillMe { get; set; }
 
-            if (joystickFound) return;
-            Console.WriteLine("Cannot find any DirectInput compatible joysticks, please make sure your controllers are connected!");
-        }
         /// <summary>
         /// Listens given joystick.
         /// </summary>
         /// <param name="joystickGuid">Joystick Guid</param>
         /// <param name="playerNumber">Player number.</param>
-        public void Listen(Guid joystickGuid, int playerNumber)
+        /// <param name="useSto0Z">If we use sto0z hack for driving.</param>
+        public void Listen(Guid joystickGuid, int playerNumber, bool useSto0Z)
         {
+            KillMe = false;
             if (!DoesJoystickExist(joystickGuid))
                 return;
 
             using (var joystick = new Joystick(new DirectInput(), joystickGuid))
             {
                 Console.WriteLine(
-                    $"Listening Player {playerNumber} GUID: {joystickGuid} ProductName: {ExtractWithoutZeroes(joystick.Information.ProductName)}");
+                    $"Listening Player {playerNumber} GUID: {joystickGuid} ProductName: {Helper.ExtractWithoutZeroes(joystick.Information.ProductName)}");
 
                 // Set BufferSize in order to use buffered data.
                 joystick.Properties.BufferSize = 512;
@@ -52,17 +39,22 @@ namespace DirtyJvsBrain
                 {
                     while (true)
                     {
+                        if (KillMe)
+                        {
+                            joystick.Unacquire();
+                            return;
+                        }
                         joystick.Poll();
                         var datas = joystick.GetBufferedData();
                         foreach (var state in datas)
                         {
                             switch (InputCode.ButtonMode)
                             {
-                                case GameSelection.InitialD6:
-                                    InitialD6Input(state);
+                                case GameProfiles.SegaRacingClassic:
+                                    SrcInput(state, useSto0Z);
                                     break;
-                                case GameSelection.VirtuaTennis4:
-                                case GameSelection.MeltyBlood:
+                                case GameProfiles.VirtuaTennis4:
+                                case GameProfiles.MeltyBlood:
                                     switch (playerNumber)
                                     {
                                         case 1:
@@ -84,16 +76,6 @@ namespace DirtyJvsBrain
                     joystick.Unacquire();
                 }
             }
-        }
-
-        /// <summary>
-        /// Joystick information strings tend to have useless zeroes, let's remove them.
-        /// </summary>
-        /// <param name="value">String with zeroes.</param>
-        /// <returns>Clean string.</returns>
-        private static string ExtractWithoutZeroes(string value)
-        {
-            return value.Split("\0".ToCharArray()).FirstOrDefault();
         }
 
         /// <summary>
@@ -172,6 +154,68 @@ namespace DirtyJvsBrain
         }
 
         /// <summary>
+        /// Listens input for Sega Racing Classic.
+        /// </summary>
+        /// <param name="state">JoystickUpdate state.</param>
+        private static void SrcInput(JoystickUpdate state, bool useSto0z)
+        {
+            PlayerButtons playerButtons = InputCode.PlayerOneButtons;
+            if (state.Offset == JoystickOffset.X)
+            {
+                InputCode.Wheel = useSto0z ? JvsHelper.CalculateWheelPos(state.Value) : JvsHelper.CalculateSto0ZWheelPos(state.Value);
+            }
+            if (state.Offset == JoystickOffset.Z)
+            {
+                if (state.Value <= 32767)
+                {
+                    InputCode.Gas = JvsHelper.CalculateGasPos(-state.Value + 32767);
+                }
+                else
+                {
+                    InputCode.Brake = JvsHelper.CalculateGasPos(state.Value - 32767);
+                }
+            }
+            if (state.Offset == JoystickOffset.Buttons0)
+            {
+                playerButtons.Up = state.Value != 0;
+            }
+            if (state.Offset == JoystickOffset.Buttons1)
+            {
+                playerButtons.Down = state.Value != 0;
+            }
+            if (state.Offset == JoystickOffset.Buttons2)
+            {
+                playerButtons.Left = state.Value != 0;
+            }
+            if (state.Offset == JoystickOffset.Buttons3)
+            {
+                playerButtons.Right = state.Value != 0;
+            }
+            if (state.Offset == JoystickOffset.Buttons5)
+            {
+                // Shift Down
+                InputCode.ShiftDown = state.Value != 0;
+            }
+            if (state.Offset == JoystickOffset.Buttons6)
+            {
+                // Shift Up
+                InputCode.ShiftUp = state.Value != 0;
+            }
+            if (state.Offset == JoystickOffset.Buttons7)
+            {
+                playerButtons.Start = state.Value != 0;
+            }
+            if (state.Offset == JoystickOffset.Buttons9)
+            {
+                playerButtons.Test = state.Value != 0;
+            }
+            if (state.Offset == JoystickOffset.Buttons6)
+            {
+                playerButtons.Service = state.Value != 0;
+            }
+        }
+
+        /// <summary>
         /// Listens input for Initial D6.
         /// </summary>
         /// <param name="state">JoystickUpdate state.</param>
@@ -180,17 +224,17 @@ namespace DirtyJvsBrain
             PlayerButtons playerButtons = InputCode.PlayerOneButtons;
             if (state.Offset == JoystickOffset.X)
             {
-                InputCode.Wheel = Helper.CalculateWheelPos(state.Value);
+                InputCode.Wheel = JvsHelper.CalculateWheelPos(state.Value);
             }
             if (state.Offset == JoystickOffset.Z)
             {
                 if (state.Value <= 32767)
                 {
-                    InputCode.Gas = Helper.CalculateGasPos(-state.Value + 32767);
+                    InputCode.Gas = JvsHelper.CalculateGasPos(-state.Value + 32767);
                 }
                 else
                 {
-                    InputCode.Brake = Helper.CalculateGasPos(state.Value - 32767);
+                    InputCode.Brake = JvsHelper.CalculateGasPos(state.Value - 32767);
                 }
             }
             if (state.Offset == JoystickOffset.Buttons5)

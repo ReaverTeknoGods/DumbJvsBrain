@@ -2,12 +2,13 @@
 using System.IO.Ports;
 using System.Threading;
 
-namespace DirtyJvsBrain
+namespace DumbJvsBrain.Common
 {
     public class SerialPortHandler
     {
         private readonly Queue<byte> _recievedData = new Queue<byte>();
         private SerialPort _port;
+        public bool KillMe { get; set; }
         //private readonly List<byte> _lastPackage = new List<byte>(); // This is for TESTING
         /// <summary>
         /// Process the queue, very dirty and hacky. Please improve.
@@ -17,6 +18,8 @@ namespace DirtyJvsBrain
         {
             while (true)
             {
+                if (KillMe)
+                    return;
                 var queue = new List<byte>();
                 if (_recievedData.Count != 0)
                 {
@@ -27,6 +30,8 @@ namespace DirtyJvsBrain
                         byte size = 0;
                         while (true)
                         {
+                            if (KillMe)
+                                return;
                             if (count == 0)
                             {
                                 queue.Add(f);
@@ -47,7 +52,7 @@ namespace DirtyJvsBrain
                                 }
                                 //_lastPackage.Clear();
                                 //_lastPackage.AddRange(queue);
-                                var reply = DumbJvs.GetReply(queue.ToArray());
+                                var reply = JvsPackageEmulator.GetReply(queue.ToArray());
                                 if (reply.Length != 0)
                                     _port.Write(reply, 0, reply.Length);
                                 break;
@@ -65,6 +70,7 @@ namespace DirtyJvsBrain
         /// <param name="port">Port name.</param>
         public void ListenSerial(string port)
         {
+            KillMe = false;
             _port = new SerialPort(port)
             {
                 BaudRate = 115200,
@@ -76,7 +82,7 @@ namespace DirtyJvsBrain
                 Handshake = Handshake.None
             };
 
-            _port.DataReceived += delegate(object sender, SerialDataReceivedEventArgs args)
+            _port.DataReceived += delegate (object sender, SerialDataReceivedEventArgs args)
             {
                 var sp = (SerialPort)sender;
                 var data = new byte[sp.BytesToRead];
@@ -88,7 +94,12 @@ namespace DirtyJvsBrain
             _port.Open();
             while (_port.IsOpen)
             {
-                Thread.Sleep(10000);
+                if (KillMe)
+                {
+                    _port.Close();
+                    break;
+                }
+                Thread.Sleep(1000);
             }
         }
     }
