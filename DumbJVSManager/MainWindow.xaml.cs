@@ -118,6 +118,7 @@ namespace DumbJVSManager
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             _settingsWindow.Close();
+            Application.Current.Shutdown(0);
         }
     }
 }

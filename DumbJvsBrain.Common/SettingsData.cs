@@ -15,6 +15,6 @@ namespace DumbJvsBrain.Common
         public string VirtuaTennis4Dir { get; set; }
         public string MeltyBloodDir { get; set; }
         public string SegaRacingClassicDir { get; set; }
-        public bool UseSto0zDrivingHack { get; set; }
+        public bool UseSto0ZDrivingHack { get; set; }
     }
 }

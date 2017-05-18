@@ -17,7 +17,7 @@ namespace DumbJvsBrain.Common
             var list = new List<JoystickProfile>();
             using (var directInput = new DirectInput())
             {
-                list.AddRange(directInput.GetDevices().Where(x => x.Type == DeviceType.Gamepad || x.Type == DeviceType.Joystick).ToList().Select(deviceInstance => new JoystickProfile
+                list.AddRange(directInput.GetDevices().Where(x => x.Type == DeviceType.Gamepad || x.Type == DeviceType.Joystick || x.Type == DeviceType.Driving || x.Type == DeviceType.Flight || x.Type == DeviceType.FirstPerson).ToList().Select(deviceInstance => new JoystickProfile
                 {
                     InstanceGuid = deviceInstance.InstanceGuid, ProductName = deviceInstance.ProductName
                 }));

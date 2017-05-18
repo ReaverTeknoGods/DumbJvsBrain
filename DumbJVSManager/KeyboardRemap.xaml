@@ -1,0 +1,64 @@
+﻿<Window x:Class="DumbJVSManager.KeyboardRemap"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DumbJVSManager"
+        mc:Ignorable="d"
+        Title="Keyboard Remap" Height="500" Width="300" Loaded="KeyboardRemap_OnLoaded"
+        Closing="KeyboardRemap_OnClosing" WindowStyle="ToolWindow">
+    <UniformGrid Columns="2">
+        <TextBlock  Text="Player 1 Start"></TextBlock>
+        <TextBox Name="TxtP1Start" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Up"></TextBlock>
+        <TextBox Name="TxtP1Up" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Down"></TextBlock>
+        <TextBox Name="TxtP1Down" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Left"></TextBlock>
+        <TextBox Name="TxtP1Left" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Right"></TextBlock>
+        <TextBox Name="TxtP1Right" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Button 1"></TextBlock>
+        <TextBox Name="TxtP1B1" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Button 2"></TextBlock>
+        <TextBox Name="TxtP1B2" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Button 3"></TextBlock>
+        <TextBox Name="TxtP1B3" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Button 4"></TextBlock>
+        <TextBox Name="TxtP1B4" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Button 5"></TextBlock>
+        <TextBox Name="TxtP1B5" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Button 6"></TextBlock>
+        <TextBox Name="TxtP1B6" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 1 Service"></TextBlock>
+        <TextBox Name="TxtP1Service" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Start"></TextBlock>
+        <TextBox Name="TxtP2Start" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Up"></TextBlock>
+        <TextBox Name="TxtP2Up" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Down"></TextBlock>
+        <TextBox Name="TxtP2Down" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Left"></TextBlock>
+        <TextBox Name="TxtP2Left" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Right"></TextBlock>
+        <TextBox Name="TxtP2Right" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Button 1"></TextBlock>
+        <TextBox Name="TxtP2B1" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Button 2"></TextBlock>
+        <TextBox Name="TxtP2B2" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Button 3"></TextBlock>
+        <TextBox Name="TxtP2B3" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Button 4"></TextBlock>
+        <TextBox Name="TxtP2B4" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Button 5"></TextBlock>
+        <TextBox Name="TxtP2B5" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Button 6"></TextBlock>
+        <TextBox Name="TxtP2B6" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Player 2 Service"></TextBlock>
+        <TextBox Name="TxtP2Service" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Test Switch"></TextBlock>
+        <TextBox Name="TxtTestSw" IsReadOnly="true"></TextBox>
+        <Button Click="BtnSaveKeys" Content="Save Keys"></Button>
+        <Button Click="BtnCancel" Content="Cancel"></Button>
+    </UniformGrid>
+</Window>

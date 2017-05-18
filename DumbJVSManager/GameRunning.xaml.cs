@@ -85,7 +85,7 @@ namespace DumbJVSManager
         {
             if (joystickGuid == Guid.Empty)
                 return null;
-            var dinputThread = new Thread(() => directInputListener.Listen(joystickGuid, playerNumber, _settingsData.UseSto0zDrivingHack));
+            var dinputThread = new Thread(() => directInputListener.Listen(joystickGuid, playerNumber, _settingsData.UseSto0ZDrivingHack));
             dinputThread.Start();
             return dinputThread;
         }

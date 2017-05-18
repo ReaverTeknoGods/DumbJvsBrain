@@ -1,11 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Windows.Forms;
 using static DumbJvsBrain.Common.JvsHelper;
 
 namespace DumbJvsBrain.Common
 {
+    public class JvsReply
+    {
+        public byte[] Bytes { get; set; }
+        public int LengthReduction { get; set; }
+    }
     public static class JvsPackageEmulator
     {
+        private static bool CompareTwoArraysGipsyWay(byte[] array1, byte[] array2, int count)
+        {
+            for(var i = 0; i < count; i++)
+                if (array1[i] != array2[i])
+                    return false;
+            return true;
+        }
         /// <summary>
         /// Gets special bits for Digital.
         /// </summary>
@@ -106,6 +122,247 @@ namespace DumbJvsBrain.Common
             return result;
         }
 
+        public static JvsReply ParsePackage(byte[] bytesLeft, bool multiPackage)
+        {
+            JvsReply reply = new JvsReply();
+            // We take first byte of the package
+            switch (bytesLeft[0])
+            {
+                case JVS_OP_ADDRESS:
+                    return JvsGetAddress(bytesLeft, reply);
+                case 0x10:
+                    return JvsGetIdentifier(reply);
+                case 0x11:
+                    return JvsGetCommandRev(reply, multiPackage);
+                case 0x12:
+                    return JvsGetJvsVersion(reply, multiPackage);
+                case 0x13:
+                    return JvsGetCommunicationVersion(reply, multiPackage);
+                case 0x14:
+                    return JvsGetSlaveFeatures(reply, multiPackage);
+                case 0x15:
+                    return JvsConveyMainBoardId(bytesLeft, reply);
+                case 0x20:
+                    return JvsGetDigitalReply(bytesLeft, reply);
+                case 0x21:
+                    return JvsGetCoinReply(bytesLeft, reply);
+                case 0x22:
+                    return JvsGetAnalogReply(bytesLeft, reply);
+                case 0x32:
+                    return JvsGeneralPurposeOutput(bytesLeft, reply);
+            }
+            MessageBox.Show($"Unknown package, contact Reaver! Package: {ByteArrayToString(bytesLeft)}");
+            throw new NotSupportedException();
+        }
+
+        private static JvsReply JvsGeneralPurposeOutput(byte[] bytesLeft, JvsReply reply)
+        {
+            var byteCount = bytesLeft[1];
+            reply.LengthReduction = byteCount + 2; // Command Code + Size + Outputs
+            reply.Bytes = new byte[] {};
+            return reply;
+        }
+
+        private static JvsReply JvsGetAddress(byte[] bytesLeft, JvsReply reply)
+        {
+            if (bytesLeft[1] != 0x01)
+            {
+                MessageBox.Show($"Unsupported JVS_OP_ADDRESS package, contact Reaver! Package: {ByteArrayToString(bytesLeft)}");
+                throw new NotSupportedException();
+            }
+            reply.Bytes = new byte[] {};
+            reply.LengthReduction = 2;
+            return reply;
+        }
+
+        private static JvsReply JvsGetIdentifier(JvsReply reply)
+        {
+            reply.LengthReduction = 1;
+            reply.Bytes = Encoding.ASCII.GetBytes(JVS_IDENTIFIER_Sega2005Jvs14572);
+            return reply;
+        }
+
+        private static JvsReply JvsGetCommunicationVersion(JvsReply reply, bool multiPackage)
+        {
+            reply.LengthReduction = 1;
+            reply.Bytes = multiPackage ? new byte[] { 0x01, 0x10 } : new byte[] { 0x10 };
+            return reply;
+        }
+
+        private static JvsReply JvsGetJvsVersion(JvsReply reply, bool multiPackage)
+        {
+            reply.LengthReduction = 1;
+            reply.Bytes = multiPackage ? new byte[] { 0x01, 0x20 } : new byte[] { 0x20 };
+            return reply;
+        }
+
+        private static JvsReply JvsGetCommandRev(JvsReply reply, bool multiPackage)
+        {
+            reply.LengthReduction = 1;
+            reply.Bytes = multiPackage ? new byte[] { 0x01, 0x13 } : new byte[] { 0x13 };
+            return reply;
+        }
+
+        private static JvsReply JvsGetSlaveFeatures(JvsReply reply, bool multiPackage)
+        {
+            reply.LengthReduction = 1;
+            reply.Bytes = multiPackage
+                ? new byte[]
+                {
+                    0x01, 0x01, 0x02, 0x0E, 0x00, 0x02, 0x02, 0x00, 0x00, 0x03, 0x08, 0x0A, 0x00, 0x12, 0x14, 0x00,
+                    0x00, 0x00
+                }
+                : new byte[]
+                {
+                    0x01, 0x02, 0x0E, 0x00, 0x02, 0x02, 0x00, 0x00, 0x03, 0x08, 0x0A, 0x00, 0x12, 0x14, 0x00, 0x00, 0x00
+                };
+            return reply;
+        }
+
+        private static JvsReply JvsConveyMainBoardId(byte[] bytesLeft, JvsReply reply)
+        {
+            for (var i = 0; i < bytesLeft.Length; i++)
+            {
+                if (i == 0x00)
+                    break;
+                reply.LengthReduction++;
+            }
+            reply.LengthReduction++;
+            reply.Bytes = new byte[]
+            {
+                0x01, 0x01, 0x05
+            };
+            return reply;
+        }
+
+        private static JvsReply JvsGetAnalogReply(byte[] bytesLeft, JvsReply reply)
+        {
+            var channelCount = bytesLeft[1];
+            reply.LengthReduction = 2;
+            var byteLst = new List<byte>();
+            if (channelCount != 0)
+            {
+                channelCount--;
+                byteLst.Add(0);
+                byteLst.Add((byte) InputCode.Wheel);
+            }
+            if (channelCount != 0)
+            {
+                channelCount--;
+                byteLst.Add(0);
+                byteLst.Add((byte) InputCode.Gas);
+            }
+            if (channelCount != 0)
+            {
+                channelCount--;
+                byteLst.Add(0);
+                byteLst.Add((byte) InputCode.Brake);
+            }
+            while (channelCount != 0)
+            {
+                channelCount--;
+                byteLst.Add(0);
+                byteLst.Add(0);
+            }
+            reply.Bytes = byteLst.ToArray();
+            return reply;
+        }
+
+        private static JvsReply JvsGetCoinReply(byte[] bytesLeft, JvsReply reply)
+        {
+            var slotCount = bytesLeft[1];
+            reply.LengthReduction = 2;
+            if (slotCount == 1)
+            {
+                reply.Bytes = new byte[] {0x00, 0x00};
+            }
+            else if (slotCount == 2)
+            {
+                reply.Bytes = new byte[] {0x00, 0x00, 0x00, 0x00};
+            }
+            else
+            {
+                MessageBox.Show($"Unknown READ_COIN_INPUTS package, contact Reaver!  Package: {ByteArrayToString(bytesLeft)}");
+                throw new NotSupportedException();
+            }
+            return reply;
+        }
+
+        private static JvsReply JvsGetDigitalReply(byte[] bytesLeft, JvsReply reply)
+        {
+            var byteLst = new List<byte>();
+            var players = bytesLeft[1];
+            var bytesToRead = bytesLeft[2];
+            byteLst.Add(GetSpecialBits());
+            if (players > 2)
+            {
+                MessageBox.Show($"Why would you have more than 2 players?  Package: {ByteArrayToString(bytesLeft)}", "Contact Reaver asap!",
+                    MessageBoxButtons.OK, MessageBoxIcon.Question);
+                throw new NotSupportedException();
+            }
+            if (players != 0)
+            {
+                byteLst.Add(GetPlayer1Controls());
+                bytesToRead--;
+                if (bytesToRead != 0)
+                {
+                    byteLst.Add(GetPlayer1ControlsExt());
+                    bytesToRead--;
+                }
+                while (bytesToRead != 0)
+                {
+                    byteLst.Add(0x00);
+                    bytesToRead--;
+                }
+                if (players == 2)
+                {
+                    bytesToRead = bytesLeft[2];
+                    byteLst.Add(GetPlayer2Controls());
+                    bytesToRead--;
+                    if (bytesToRead != 0)
+                    {
+                        byteLst.Add(GetPlayer2ControlsExt());
+                        bytesToRead--;
+                    }
+                    while (bytesToRead != 0)
+                    {
+                        byteLst.Add(0x00);
+                        bytesToRead--;
+                    }
+                }
+            }
+            reply.LengthReduction = 3;
+            reply.Bytes = byteLst.ToArray();
+            return reply;
+        }
+
+        private static byte[] AdnvacedJvs(byte[] data)
+        {
+            // Disect package (take out unwanted data)
+            var byteLst = new List<byte>();
+            var multiPackage = false;
+            var replyBytes = new List<byte>();
+            var packageSize = data[2] - 1; // Reduce CRC as we don't need that
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (i == 0 || i == 1 || i == 2 || i == data.Length-1)
+                    continue;
+                byteLst.Add(data[i]);
+            }
+            for (var i = 0; i < packageSize;)
+            {
+                var reply = ParsePackage(byteLst.ToArray(), multiPackage);
+                for (int x = 0; x < reply.LengthReduction; x++)
+                {
+                    byteLst.RemoveAt(0);
+                }
+                i += reply.LengthReduction;
+                replyBytes.AddRange(reply.Bytes);
+                multiPackage = true;
+            }
+            return replyBytes.ToArray();
+        }
+
         /// <summary>
         /// THIS CODE IS BEYOND RETARTED AND FOR HACKY TESTS ONLY!!!
         /// For proper JVS handling: must code proper detection of packages, multiple requests in one package and proper responses!
@@ -116,166 +373,24 @@ namespace DumbJvsBrain.Common
         /// <returns>"proper" response.</returns>
         public static byte[] GetReply(byte[] data)
         {
+            // We don't care about these kind of packages, need to improve in case comes with lot of delay etc.
             if (data.Length <= 3)
                 return new byte[0];
-            // TODO: REWRITE TO UNDERSTAND MULTIPLE COMMANDS IN ONE, INSTEAD OF HARDCODED WITH LENGTH. Good for MKDX etc.
+            //Console.WriteLine("Package: " + ByteArrayToString(data));
             switch (data[3])
             {
                 // E0FF03F0D9CB
                 case JVS_OP_RESET:
                     {
                         return new byte[0];
-                        // You can reply but it seems to be totally useless in 99% of cases.
-                        //replyBytes.Add(JVS_SYNC_CODE);
-                        //replyBytes.Add(0x00);
-                        //replyBytes.Add(0x03);
-                        //replyBytes.Add(0x01);
-                        //replyBytes.Add(0x01);
-                        //replyBytes.Add(0x05);
-                        //return replyBytes.ToArray();
                     }
-                // E0FF03F101F4
-                case JVS_OP_ADDRESS:
-                    {
-                        var replyData = new byte[] { 0x01, 0x01 };
-                        return CraftJvsPackage(0, replyData);
-                    }
-                // E001021013
-                case 0x10: // GET IDENTIFIER
-                    {
-                        var replyData = new List<byte>();
-                        byte[] toBytes = Encoding.ASCII.GetBytes(JVS_IDENTIFIER_Sega2005Jvs14572);
-                        replyData.AddRange(toBytes);
-                        return CraftJvsPackage(0, replyData.ToArray());
-                    }
-                // E001051112131450
-                // E001041112133B
-                case 0x11: // (JVS_COMMAND_REV)
-                    {
-                        if (data.Length == 8)
-                        {
-                            var replyData = new byte[]
-                            {
-                                0x01, 0x01, 0x11, 0x01, 0x20, 0x01, 0x10, 0x01, 0x01, 0x02, 0x0D, 0x00, 0x02, 0x02, 0x00,
-                                0x00, 0x03, 0x08, 0x00, 0x00, 0x12, 0x06, 0x00, 0x00, 0x00
-                            };
-                            return CraftJvsPackage(0, replyData);
-                        }
-                        if (data.Length == 7)
-                        {
-                            var replyData = new byte[] { 0x01, 0x01, 0x13, 0x01, 0x20, 0x01, 0x10 };
-                            return CraftJvsPackage(0, replyData);
-                        }
-                        return new byte[0];
-                    }
-                // e0 01 02 14 17
-                case 0x14: // get slave features
-                    {
-                        // e0 00 14 01 01 01 02 0e 00 02 02 00 00 03 08 0a 00 12 14 00 00 00 66
-                        var replyData = new byte[] { 0x01, 0x01, 0x01, 0x02, 0x0E, 0x00, 0x02, 0x02, 0x00, 0x00, 0x03, 0x08, 0x0A, 0x00, 0x12, 0x14, 0x00, 0x00, 0x00 };
-                        return CraftJvsPackage(0, replyData);
-                    }
-                case 0x15:
-                    {
-                        var replyData = new byte[] { 0x01, 0x01, 0x05 };
-                        return CraftJvsPackage(0, replyData);
-                    }
-                // E0010D200202220821023203000000B4
-                case 0x20: // JVS_GET_DIGITAL + ANALOG
-                    {
-                        if (data.Length == 16)
-                        {
-                            // 01    01    00    00    00    00    00    01    71    00    1B    00    1F 00 1A 00 1F 00 1A 00 19 00 18 00 01 00 00 00 00 02
-                            var replyData = new byte[] { 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7A, 0x00, 0x1D, 0x00, 0x1E, 0x00, 0x1A, 0x00, 0x22, 0x00, 0x1C, 0x00, 0x1A, 0x00, 0x19, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x02 };
-                            replyData[2] = GetSpecialBits();
-                            replyData[3] = GetPlayer1Controls();
-                            replyData[4] = GetPlayer1ControlsExt();
-                            replyData[5] = GetPlayer2Controls();
-                            replyData[6] = GetPlayer2ControlsExt();
-                            replyData[8] = (byte)InputCode.Wheel;
-                            replyData[10] = (byte)InputCode.Gas;
-                            replyData[12] = (byte)InputCode.Brake;
-                            return CraftJvsPackage(0, replyData);
-                        }
-                        // e0010c2002022101220632020000af
-                        else if (data.Length == 15)
-                        {
-                            //  e0 00 19 01 01 00 00 00 00 00 01 00 00 01 4f 40 4f 00 52 40 57 80 4e 40 4f 00 01 42 
-                            //  01 01 00 00 00 00 00 01 00 00 01 8B C0 8C 40 90 40 97 40 8A 40 8C 80 01
-                            //  01 01 00 00 00 00 00 01 00 00 01 4f 40 4f 00 52 40 57 80 4e 40 4f 00 01 42 
-                            //                             01    01    00    00    00    00    00    01    00    00    01    70 00 1B 00 1F 00 1A 00 1F 00 1A 00 02
-                            var replyData = new byte[] { 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x4f, 0x40, 0x4f, 0x00, 0x52, 0x40, 0x57, 0x80, 0x4e, 0x40, 0x4f, 0x00, 0x01 };
-                            replyData[2] = GetSpecialBits();
-                            replyData[3] = GetPlayer1Controls();
-                            replyData[4] = GetPlayer1ControlsExt();
-                            replyData[5] = GetPlayer2Controls();
-                            replyData[6] = GetPlayer2ControlsExt();
-                            replyData[11] = (byte)InputCode.Wheel;
-                            replyData[13] = (byte)InputCode.Gas;
-                            replyData[15] = (byte)InputCode.Brake;
-                            return CraftJvsPackage(0, replyData);
-                        }
-                        // 0xe0, 0x01, 0x0b, 0x20, 0x02, 0x02, 0x22, 0x08, 0x21, 0x02, 0x32, 0x01, 0x00, 0xb0
-                        else if (data.Length == 14)
-                        {
-                            // 01 01 00 00 00 00 00 01 71 00 1A 00 1F 00 1B 00 1F 00 1A 00 19 00 18 00 01 00 00 00 00 01
-                            var replyData = new byte[] { 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x71, 0x00, 0x1A, 0x00, 0x1F, 0x00, 0x1B, 0x00, 0x1F, 0x00, 0x1A, 0x00, 0x19, 0x00, 0x18, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01 };
-                            replyData[2] = GetSpecialBits();
-                            replyData[3] = GetPlayer1Controls();
-                            replyData[4] = GetPlayer1ControlsExt();
-                            replyData[5] = GetPlayer2Controls();
-                            replyData[6] = GetPlayer2ControlsExt();
-                            replyData[8] = (byte)InputCode.Wheel;
-                            replyData[10] = (byte)InputCode.Gas;
-                            replyData[12] = (byte)InputCode.Brake;
-                            return CraftJvsPackage(0, replyData);
-                        }
-                        // E00108200202220821027A
-                        else if (data.Length == 11)
-                        {
-                            //                             01    01    00    00    00    00    00    01    78 00 1B 00 1E 00 19 00 20 00 1B 00 19 00 18 00 01 00 00 00 00
-                            var replyData = new byte[] { 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x80, 0x00, 0x1B, 0x00, 0x1F, 0x00, 0x1A, 0x00, 0x21, 0x00, 0x1B, 0x00, 0x19, 0x00, 0x18, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 };
-                            replyData[2] = GetSpecialBits();
-                            replyData[3] = GetPlayer1Controls();
-                            replyData[4] = GetPlayer1ControlsExt();
-                            replyData[5] = GetPlayer2Controls();
-                            replyData[6] = GetPlayer2ControlsExt();
-                            replyData[8] = (byte)InputCode.Wheel;
-                            replyData[10] = (byte)InputCode.Gas;
-                            replyData[12] = (byte)InputCode.Brake;
-                            return CraftJvsPackage(0, replyData);
-                        }
-                        else
-                        {
-                            var replyData = new byte[] { 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00 };
-                            replyData[2] = GetSpecialBits();
-                            replyData[3] = GetPlayer1Controls();
-                            replyData[4] = GetPlayer1ControlsExt();
-                            replyData[5] = GetPlayer2Controls();
-                            replyData[6] = GetPlayer2ControlsExt();
-                            return CraftJvsPackage(0, replyData);
-                        }
-                    }
-                case 0x21: // JVS_GET_COIN
-                    {
-                        var replyData = new byte[] { 0x02, 0x01, 0x00, 0x00, 0x00, 0x00 };
-                        return CraftJvsPackage(0, replyData);
-                    }
-                case 0x22: // JVS_GET_ANALOG
-                    {
-                        var replyData = new byte[] { 0x02, 0x01, 0x7A, 0x00, 0x1C, 0x00, 0x20, 0x00 };
-                        replyData[2] = (byte)InputCode.Wheel;
-                        replyData[4] = (byte)InputCode.Gas;
-                        replyData[6] = (byte)InputCode.Brake;
-                        return CraftJvsPackage(0, replyData);
-                    }
-                case 0x70:
-                    {
-                        var replyData = new byte[] { 0x01, 0x01, 0x01, 0x07 };
-                        return CraftJvsPackage(0, replyData);
-                    }
+                default:
+                {
+                    var reply = CraftJvsPackageWithStatusAndReport(0, AdnvacedJvs(data));
+                    //Console.WriteLine("Reply: " + ByteArrayToString(reply));
+                    return reply;
+                }
             }
-            return new byte[0];
         }
     }
 }

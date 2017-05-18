@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DumbJVSManager"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="Dumb JVS Manager 0.3" Height="270" Width="640" Loaded="Window_Loaded" Closing="MainWindow_OnClosing">
+        Title="Dumb JVS Manager 0.4" Height="500" Width="640" Loaded="Window_Loaded" Closing="MainWindow_OnClosing">
     <Grid>
         <StackPanel>
-            <Image Source="Resources/teknogods3___.png"/>
+            <Image Source="Resources/teknoparrot_by_pooterman-db9erxd.png" MaxWidth="400" MaxHeight="350"/>
             <TextBlock HorizontalAlignment="Center" Text="Game launcher"/>
             <ComboBox Name="GameListComboBox" SelectedIndex="0" HorizontalContentAlignment="Center">
                 <ComboBoxItem Content="Melty Blood Actress Again Current Code"/>

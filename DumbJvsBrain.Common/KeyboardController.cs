@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
 
@@ -6,31 +6,158 @@ namespace DumbJvsBrain.Common
 {
     public class KeyboardController
     {
-        private IKeyboardMouseEvents m_GlobalHook;
+        private IKeyboardMouseEvents _mGlobalHook;
         private bool _hookPlayer1;
         private bool _hookPlayer2;
+        private bool _useCustomKeys;
+        private KeyboardMap _kbMap;
 
         public void Subscribe(bool hookPlayer1, bool hookPlayer2)
         {
             _hookPlayer1 = hookPlayer1;
             _hookPlayer2 = hookPlayer2;
-            // Note: for the application hook, use the Hook.AppEvents() instead
-            m_GlobalHook = Hook.GlobalEvents();
+            _mGlobalHook = Hook.GlobalEvents();
+            _mGlobalHook.KeyDown += MGlobalHookOnKeyDown;
+            _mGlobalHook.KeyUp += MGlobalHookOnKeyUp;
 
-            //m_GlobalHook.MouseDownExt += GlobalHookMouseDownExt;
-            m_GlobalHook.KeyDown += MGlobalHookOnKeyDown;
-            //m_GlobalHook.KeyPress += GlobalHookKeyPress;
-            m_GlobalHook.KeyUp += MGlobalHookOnKeyUp;
+            if (!File.Exists("KeyboardMap.xml"))
+            {
+                _useCustomKeys = false;
+                return;
+            }
+            _kbMap = KeyboardHelper.DeSerialize();
+            _useCustomKeys = true;
         }
 
         private void MGlobalHookOnKeyDown(object sender, KeyEventArgs keyEventArgs)
         {
-            SetPlayerButton(keyEventArgs.KeyCode, true);
+            if (!_useCustomKeys)
+                SetPlayerButton(keyEventArgs.KeyCode, true);
+            else
+                SetPlayerCustomButton((int)keyEventArgs.KeyCode, true);
         }
 
         private void MGlobalHookOnKeyUp(object sender, KeyEventArgs keyEventArgs)
         {
-            SetPlayerButton(keyEventArgs.KeyCode, false);
+            if(!_useCustomKeys)
+                SetPlayerButton(keyEventArgs.KeyCode, false);
+            else
+                SetPlayerCustomButton((int)keyEventArgs.KeyCode, false);
+        }
+
+        private void SetPlayerCustomButton(int key, bool pressed)
+        {
+            if (_hookPlayer1)
+            {
+                if (key == _kbMap.P1Start)
+                {
+                    InputCode.PlayerOneButtons.Start = pressed;
+                }
+                if (key == _kbMap.P1Left)
+                {
+                    //InputCode.Wheel = pressed ? 0x20 : 0x7F;
+                    InputCode.PlayerOneButtons.Left = pressed;
+                }
+                if (key == _kbMap.P1Right)
+                {
+                    //InputCode.Wheel = pressed ? 0xD0 : 0x7F;
+                    InputCode.PlayerOneButtons.Right = pressed;
+                }
+                if (key == _kbMap.P1Up)
+                {
+                    //InputCode.Gas = pressed ? 0xFF : 0x00;
+                    InputCode.PlayerOneButtons.Up = pressed;
+                }
+                if (key == _kbMap.P1Down)
+                {
+                    //InputCode.Brake = pressed ? 0xFF : 0x00;
+                    InputCode.PlayerOneButtons.Down = pressed;
+                }
+                if (key == _kbMap.P1B1)
+                {
+                    InputCode.PlayerOneButtons.Button1 = pressed;
+                }
+                if (key == _kbMap.P1B2)
+                {
+                    InputCode.PlayerOneButtons.Button2 = pressed;
+                }
+                if (key == _kbMap.P1B3)
+                {
+                    InputCode.PlayerOneButtons.Button3 = pressed;
+                }
+                if (key == _kbMap.P1B4)
+                {
+                    InputCode.PlayerOneButtons.Button4 = pressed;
+                }
+                if (key == _kbMap.P1B5)
+                {
+                    InputCode.PlayerOneButtons.Button5 = pressed;
+                }
+                if (key == _kbMap.P1B6)
+                {
+                    InputCode.PlayerOneButtons.Button6 = pressed;
+                }
+
+            }
+            if (_hookPlayer2)
+            {
+                if (key == _kbMap.P2Start)
+                {
+                    InputCode.PlayerTwoButtons.Start = pressed;
+                }
+                if (key == _kbMap.P2Left)
+                {
+                    InputCode.PlayerTwoButtons.Left = pressed;
+                }
+                if (key == _kbMap.P2Right)
+                {
+                    InputCode.PlayerTwoButtons.Right = pressed;
+                }
+                if (key == _kbMap.P2Up)
+                {
+                    InputCode.PlayerTwoButtons.Up = pressed;
+                }
+                if (key == _kbMap.P2Down)
+                {
+                    InputCode.PlayerTwoButtons.Down = pressed;
+                }
+                if (key == _kbMap.P2B1)
+                {
+                    InputCode.PlayerTwoButtons.Button1 = pressed;
+                }
+                if (key == _kbMap.P2B2)
+                {
+                    InputCode.PlayerTwoButtons.Button2 = pressed;
+                }
+                if (key == _kbMap.P2B3)
+                {
+                    InputCode.PlayerTwoButtons.Button3 = pressed;
+                }
+                if (key == _kbMap.P2B4)
+                {
+                    InputCode.PlayerTwoButtons.Button4 = pressed;
+                }
+                if (key == _kbMap.P2B5)
+                {
+                    InputCode.PlayerTwoButtons.Button5 = pressed;
+                }
+                if (key == _kbMap.P2B6)
+                {
+                    InputCode.PlayerTwoButtons.Button6 = pressed;
+                }
+            }
+            if (key == _kbMap.TestSw)
+            {
+                InputCode.PlayerOneButtons.Test = pressed;
+            }
+            if (key == _kbMap.P1Service)
+            {
+                InputCode.PlayerOneButtons.Service = pressed;
+            }
+            if (key == _kbMap.P2Service)
+            {
+                InputCode.PlayerTwoButtons.Service = pressed;
+            }
         }
 
         void SetPlayerButton(Keys key, bool pressed)
@@ -148,37 +275,13 @@ namespace DumbJvsBrain.Common
             }
         }
 
-        ///// <summary>
-        ///// Hooks the keyboard.
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //private void GlobalHookKeyPress(object sender, KeyPressEventArgs e)
-        //{
-        //}
-
-        /// <summary>
-        /// Hooks mouse, not needed until we have proper gun game support.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void GlobalHookMouseDownExt(object sender, MouseEventExtArgs e)
-        {
-            //Console.WriteLine("MouseDown: \t{0}; \t System Timestamp: \t{1}", e.Button, e.Timestamp);
-
-            // uncommenting the following line will suppress the middle mouse button click
-            // if (e.Buttons == MouseButtons.Middle) { e.Handled = true; }
-        }
-
         public void Unsubscribe()
         {
-            //m_GlobalHook.MouseDownExt -= GlobalHookMouseDownExt;
-            m_GlobalHook.KeyDown -= MGlobalHookOnKeyDown;
-            //m_GlobalHook.KeyPress -= GlobalHookKeyPress;
-            m_GlobalHook.KeyUp -= MGlobalHookOnKeyUp;
+            _mGlobalHook.KeyDown -= MGlobalHookOnKeyDown;
+            _mGlobalHook.KeyUp -= MGlobalHookOnKeyUp;
 
             //It is recommened to dispose it
-            m_GlobalHook.Dispose();
+            _mGlobalHook.Dispose();
         }
     }
 }

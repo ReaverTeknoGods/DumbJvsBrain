@@ -31,7 +31,7 @@ namespace DumbJVSManager
             TxtSrcLocation.Text = _settingsData.SegaRacingClassicDir;
             TxtVt4Location.Text = _settingsData.VirtuaTennis4Dir;
             TxtMeltyBloodLocation.Text = _settingsData.MeltyBloodDir;
-            ChkUseSto0ZCheckBox.IsChecked = _settingsData.UseSto0zDrivingHack;
+            ChkUseSto0ZCheckBox.IsChecked = _settingsData.UseSto0ZDrivingHack;
         }
 
         private void BtnHelpJvs(object sender, RoutedEventArgs e)
@@ -111,7 +111,7 @@ namespace DumbJVSManager
                     SegaRacingClassicDir = TxtSrcLocation.Text,
                     VirtuaTennis4Dir = TxtVt4Location.Text,
                     MeltyBloodDir = TxtMeltyBloodLocation.Text,
-                    UseSto0zDrivingHack = ChkUseSto0ZCheckBox.IsChecked != null && ChkUseSto0ZCheckBox.IsChecked.Value
+                    UseSto0ZDrivingHack = ChkUseSto0ZCheckBox.IsChecked != null && ChkUseSto0ZCheckBox.IsChecked.Value
                 };
                 JoystickHelper.Serialize(settingsData);
                 _settingsData = settingsData;
@@ -233,6 +233,12 @@ namespace DumbJVSManager
             {
                 ((TextBox) sender).Text = openFileDialog.FileName;
             }
+        }
+
+        private void BtnKeyboardRemap_OnClick(object sender, RoutedEventArgs e)
+        {
+            KeyboardRemap remap = new KeyboardRemap();
+            remap.ShowDialog();
         }
     }
 }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumbJvsBrain.UnitTests", "D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumbJvsBrain.Common", "DumbJvsBrain.Common\DumbJvsBrain.Common.csproj", "{599710AE-AB2B-42FC-9583-5685D6726E0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumbJvsOnlyJvs", "DumbJvsCmd\DumbJvsOnlyJvs.csproj", "{EF04252B-B0A1-4233-8C17-C113B10956AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,14 @@ Global
 		{599710AE-AB2B-42FC-9583-5685D6726E0D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{599710AE-AB2B-42FC-9583-5685D6726E0D}.Release|x86.ActiveCfg = Release|x86
 		{599710AE-AB2B-42FC-9583-5685D6726E0D}.Release|x86.Build.0 = Release|x86
+		{EF04252B-B0A1-4233-8C17-C113B10956AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF04252B-B0A1-4233-8C17-C113B10956AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF04252B-B0A1-4233-8C17-C113B10956AE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EF04252B-B0A1-4233-8C17-C113B10956AE}.Debug|x86.Build.0 = Debug|Any CPU
+		{EF04252B-B0A1-4233-8C17-C113B10956AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF04252B-B0A1-4233-8C17-C113B10956AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF04252B-B0A1-4233-8C17-C113B10956AE}.Release|x86.ActiveCfg = Release|Any CPU
+		{EF04252B-B0A1-4233-8C17-C113B10956AE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

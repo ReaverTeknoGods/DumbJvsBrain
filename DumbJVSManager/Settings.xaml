@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DumbJVSManager"
         mc:Ignorable="d" WindowStartupLocation="CenterOwner"
-        Title="Settings" Height="500" Width="640" Loaded="Window_Loaded" WindowStyle="ToolWindow" Closing="EditGamesWindow_OnClosing">
+        Title="Settings" Height="520" Width="640" Loaded="Window_Loaded" WindowStyle="ToolWindow" Closing="EditGamesWindow_OnClosing">
     <Grid>
         <StackPanel>
             <Image Source="Resources/teknogods3___.png"/>
+            <Button Name="BtnKeyboardRemap" Content="Remap Keyboard" Click="BtnKeyboardRemap_OnClick"/>
             <CheckBox Name="ChkUseKeyboard" HorizontalAlignment="Center" Content="Use Keyboard Input"/>
             <CheckBox Name="ChkUseSto0ZCheckBox" Content="Use Sto0z driving improvement" HorizontalAlignment="Center"/>
             <TextBlock HorizontalAlignment="Center" Text="Player 1 Joystick"/>
