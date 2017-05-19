@@ -270,9 +270,7 @@ namespace DumbJvsBrain.Common
         {
             return new DirectInput().GetDevices()
                 .Any(
-                    x =>
-                        (x.Type == DeviceType.Gamepad || x.Type == DeviceType.Joystick || x.Type == DeviceType.Driving || x.Type == DeviceType.Flight || x.Type == DeviceType.FirstPerson) &&
-                        x.InstanceGuid == joystickGuid);
+                    x => x.InstanceGuid == joystickGuid);
         }
     }
 }

@@ -243,7 +243,7 @@ namespace DumbJvsBrain.Common
             if (channelCount != 0)
             {
                 channelCount--;
-                byteLst.Add(0);
+                byteLst.Add(1);
                 byteLst.Add((byte) InputCode.Wheel);
             }
             if (channelCount != 0)

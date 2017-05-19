@@ -64,7 +64,7 @@ namespace DumbJvsBrain.UnitTests
             InputCode.Gas = 0xBE;
             InputCode.Brake = 0xBE;
             var requestBytes = CraftJvsPackage(1, new byte[] { JVS_READ_ANALOG, 0x03 }); // 22 = REQUEST ANALOG, 3 = 3 Channels
-            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { 0x00, (byte)InputCode.Wheel, 0x00, (byte)InputCode.Gas, 0x00, (byte)InputCode.Brake});
+            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { 0x01, (byte)InputCode.Wheel, 0x00, (byte)InputCode.Gas, 0x00, (byte)InputCode.Brake});
 
             // Act
             var reply = GetReply(requestBytes);
@@ -109,7 +109,7 @@ namespace DumbJvsBrain.UnitTests
             InputCode.Gas = 0xBE;
             InputCode.Brake = 0xBE;
             var requestBytes = CraftJvsPackage(1, new byte[] { JVS_READ_DIGITAL, 0x02, 0x02, JVS_READ_ANALOG, 0x03 }); // 22 = REQUEST DIGITAL, 2 = Player Count, 2 Bytes Per Player, 22 = REQUEST ANALOG, 3 = 3 Channels
-            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { 0x80, 0x02, 0x40, 0x02, 0x40, 0x00, (byte)InputCode.Wheel, 0x00, (byte)InputCode.Gas, 0x00, (byte)InputCode.Brake }); // Special Switches, P1, P1Ext, P2, P2Ext
+            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { 0x80, 0x02, 0x40, 0x02, 0x40, 0x01, (byte)InputCode.Wheel, 0x00, (byte)InputCode.Gas, 0x00, (byte)InputCode.Brake }); // Special Switches, P1, P1Ext, P2, P2Ext
 
             // Act
             var reply = GetReply(requestBytes);
