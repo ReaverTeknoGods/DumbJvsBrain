@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Navigation;
 using DumbJvsBrain.Common;
 
 namespace DumbJVSManager
@@ -57,16 +60,31 @@ namespace DumbJVSManager
 
         private void BtnStartGame(object sender, RoutedEventArgs e)
         {
-            switch ((GameProfiles)GameListComboBox.SelectedIndex)
+            switch ((GameProfiles)Convert.ToInt32(((ComboBoxItem)GameListComboBox.SelectedItem).Tag))
             {
+                case GameProfiles.LetsGoIsland:
+                    ValidateAndRun(_settingsData.LgiDir, GameProfiles.LetsGoIsland, "-TestMode");
+                    break;
                 case GameProfiles.MeltyBlood:
-                    ValidateAndRun(_settingsData.MeltyBloodDir, GameProfiles.MeltyBlood);
+                    ValidateAndRun(_settingsData.MeltyBloodDir, GameProfiles.MeltyBlood, "/T");
                     break;
                 case GameProfiles.SegaRacingClassic:
-                    ValidateAndRun(_settingsData.SegaRacingClassicDir, GameProfiles.SegaRacingClassic);
+                    ValidateAndRun(_settingsData.SegaRacingClassicDir, GameProfiles.SegaRacingClassic, "-t");
                     break;
                 case GameProfiles.VirtuaTennis4:
-                    ValidateAndRun(_settingsData.VirtuaTennis4Dir, GameProfiles.VirtuaTennis4);
+                    ValidateAndRun(_settingsData.VirtuaTennis4Dir, GameProfiles.VirtuaTennis4, "-t");
+                    break;
+                case GameProfiles.SegaSonicAllStarsRacing:
+                    ValidateAndRun(_settingsData.SegaSonicDir, GameProfiles.SegaSonicAllStarsRacing, "", true, "gametest.exe");
+                    break;
+                case GameProfiles.SegaDreamRaiders:
+                    ValidateAndRun(_settingsData.SegaDreamRaidersDir, GameProfiles.SegaDreamRaiders, "T");
+                    break;
+                case GameProfiles.InitialD6Aa:
+                    ValidateAndRun(_settingsData.InitialD6Dir, GameProfiles.InitialD6Aa, "-t");
+                    break;
+                case GameProfiles.GoldenGun:
+                    ValidateAndRun(_settingsData.GoldenGunDir, GameProfiles.GoldenGun, "-t", true, "TestMode.exe");
                     break;
             }
         }
@@ -76,7 +94,10 @@ namespace DumbJVSManager
         /// </summary>
         /// <param name="gameLocation">Game executable location.</param>
         /// <param name="gameProfile">Input profile.</param>
-        private void ValidateAndRun(string gameLocation, GameProfiles gameProfile)
+        /// <param name="testMenuString">Command to run test menu.</param>
+        /// <param name="testMenuIsExe">If uses separate exe.</param>
+        /// <param name="exeName">Test menu exe name.</param>
+        private void ValidateAndRun(string gameLocation, GameProfiles gameProfile, string testMenuString, bool testMenuIsExe = false, string exeName = "")
         {
             if (!File.Exists(gameLocation))
             {
@@ -97,7 +118,66 @@ namespace DumbJVSManager
                 return;
             }
             var testMenu = ChkTestMenu.IsChecked != null && ChkTestMenu.IsChecked.Value;
-            var gameRunning = new GameRunning(gameLocation, gameProfile, testMenu, _settingsData);
+
+            JoystickMapping jmap1 = null;
+            JoystickMapping jmap2 = null;
+
+            XInputMapping xmap1 = null;
+            XInputMapping xmap2 = null;
+
+            try
+            {
+                if (File.Exists("JoystickMapping1.xml"))
+                {
+                    jmap1 = JoystickHelper.DeSerialize(1);
+                }
+
+                if (File.Exists("JoystickMapping2.xml"))
+                {
+                    jmap2 = JoystickHelper.DeSerialize(2);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Loading joystick mapping failed with error: {ex.InnerException} {ex.Message}", "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                if (File.Exists("XInputMapping1.xml"))
+                {
+                    xmap1 = JoystickHelper.DeSerializeXInput(1);
+                }
+
+                if (File.Exists("XInputMapping2.xml"))
+                {
+                    xmap2 = JoystickHelper.DeSerializeXInput(2);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Loading joystick mapping failed with error: {ex.InnerException} {ex.Message}", "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
+            }
+
+            if (jmap1 == null)
+                jmap1 = new JoystickMapping();
+
+            if (jmap2 == null)
+                jmap2 = new JoystickMapping();
+
+            if (xmap1 == null)
+                xmap1 = new XInputMapping();
+
+            if (xmap2 == null)
+                xmap2 = new XInputMapping();
+
+            var gameRunning = new GameRunning(gameLocation, gameProfile, testMenu, _settingsData, testMenuString, jmap1, jmap2, xmap1, xmap2, testMenuIsExe, exeName);
             gameRunning.ShowDialog();
             gameRunning.Close();
         }
@@ -119,6 +199,28 @@ namespace DumbJVSManager
         {
             _settingsWindow.Close();
             Application.Current.Shutdown(0);
+        }
+
+        private void BtnAbout(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(
+                "TeknoParrot by Reaver / TeknoGods\nSpecial Thanks to Patreons and especially:\n- Enrique Rivera\n- Eden Aharoni",
+                "About", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void Image_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Process.Start("https://www.patreon.com/Teknogods");
+        }
+
+        private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start("https://teknogods.com");
+        }
+
+        private void BtnHelp(object sender, RoutedEventArgs e)
+        {
+            Process.Start("https://teknogods.com/phpbb/viewforum.php?f=83");
         }
     }
 }

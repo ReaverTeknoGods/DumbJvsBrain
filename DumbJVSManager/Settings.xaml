@@ -5,27 +5,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DumbJVSManager"
         mc:Ignorable="d" WindowStartupLocation="CenterOwner"
-        Title="Settings" Height="520" Width="640" Loaded="Window_Loaded" WindowStyle="ToolWindow" Closing="EditGamesWindow_OnClosing">
+        Title="Settings" Height="800" Width="640" Loaded="Window_Loaded" WindowStyle="ToolWindow" Closing="EditGamesWindow_OnClosing">
     <Grid>
         <StackPanel>
             <Image Source="Resources/teknogods3___.png"/>
             <Button Name="BtnKeyboardRemap" Content="Remap Keyboard" Click="BtnKeyboardRemap_OnClick"/>
+            <TextBlock HorizontalAlignment="Center">
             <CheckBox Name="ChkUseKeyboard" HorizontalAlignment="Center" Content="Use Keyboard Input"/>
-            <CheckBox Name="ChkUseSto0ZCheckBox" Content="Use Sto0z driving improvement" HorizontalAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Center" Text="Player 1 Joystick"/>
+            <CheckBox Name="ChkUseMouse" HorizontalAlignment="Center" Content="Use Mouse for gun games"/>
+            </TextBlock>
+            <CheckBox Name="ChkUseSto0ZCheckBox" Content="Use Sto0z driving improvement (Good if wheel hard to turn)" HorizontalAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center" Text="Joystick interface"/>
+            <ComboBox HorizontalContentAlignment="Center" Name="CmbJoystickInterface" SelectionChanged="Selector_OnSelectionChanged">
+                <ComboBoxItem>Direct Input</ComboBoxItem>
+                <ComboBoxItem>XInput</ComboBoxItem>
+            </ComboBox>
+            <TextBlock Name="P1JoystickLabel" HorizontalAlignment="Center" Text="Player 1 Joystick"/>
             <ComboBox Name="P1JoystickComboBox" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Center" Text="Player 2 Joystick"/>
+            <TextBlock Name="P2JoystickLabel" HorizontalAlignment="Center" Text="Player 2 Joystick"/>
             <ComboBox Name="P2JoystickComboBox" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <Button Click="BtnRefreshJoysticks" Content="Refresh joysticks"/>
+            <Button Name="BtnJoystickRefresh" Click="BtnRefreshJoysticks" Content="Refresh joysticks"/>
+            <Button Click="BtnRemapJoysticks" Content="Remap Joystick Player 1"/>
+            <Button Click="BtnRemapJoysticks2" Content="Remap Joystick Player 2"/>
             <TextBlock Text="JVS Emulation setup" HorizontalAlignment="Center"/>
             <Button Content="Click here if you don't have com0com installed." Click="BtnHelpJvs"/>
             <Button Content="Auto setup JVS emulation ports (Administrator required)" Click="BtnSetupCom0Com"/>
             <Button Click="BtnTestJvs" Content="Test JVS Emulation"/>
             <TextBlock HorizontalAlignment="Center" Text="Game Locations"></TextBlock>
+            <TextBlock Text="Initial D6AA"/>
+            <TextBox Name="TxtInitialD6Location" PreviewMouseDown="SelectExecutableForTextBox"></TextBox>
+            <TextBlock Text="Let's Go Island"/>
+            <TextBox Name="TxtLgiLocation" PreviewMouseDown="SelectExecutableForTextBox"></TextBox>
             <TextBlock Text="Melty Blood Actress Again Current Code"></TextBlock>
             <TextBox Name="TxtMeltyBloodLocation" PreviewMouseDown="SelectExecutableForTextBox"></TextBox>
+            <TextBlock Text="Sega Dream Raiders"/>
+            <TextBox Name="TxtSdrLocation" PreviewMouseDown="SelectExecutableForTextBox"></TextBox>
+            <TextBlock Text="Sega Golden Gun"/>
+            <TextBox Name="TxtGoldenGunLocation" PreviewMouseDown="SelectExecutableForTextBox"></TextBox>
             <TextBlock Text="Sega Racing Classic"></TextBlock>
             <TextBox Name="TxtSrcLocation" PreviewMouseDown="SelectExecutableForTextBox"></TextBox>
+            <TextBlock Text="Sega Sonic All-Stars Racing Arcade"/>
+            <TextBox Name="TxtSegaSonicLocation" PreviewMouseDown="SelectExecutableForTextBox"></TextBox>
             <TextBlock Text="Virtua Tennis 4"/>
             <TextBox Name="TxtVt4Location" PreviewMouseDown="SelectExecutableForTextBox"></TextBox>
             <Button Click="BtnSaveSettings" Content="Save settings"/>

@@ -1,6 +1,4 @@
-﻿using System.Windows.Forms;
-
-namespace DumbJvsBrain.Common
+﻿namespace DumbJvsBrain.Common
 {
     public class KeyboardMap
     {

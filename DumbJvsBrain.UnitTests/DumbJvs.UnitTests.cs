@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using DumbJvsBrain.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -60,11 +61,11 @@ namespace DumbJvsBrain.UnitTests
         public void JVS_GET_ANALOG_ShouldReturnThreeChannels()
         {
             // Arrange
-            InputCode.Wheel = 0xBA;
-            InputCode.Gas = 0xBE;
-            InputCode.Brake = 0xBE;
+            InputCode.AnalogBytes[0] = 0xBA;
+            InputCode.AnalogBytes[2] = 0xBE;
+            InputCode.AnalogBytes[4] = 0xBE;
             var requestBytes = CraftJvsPackage(1, new byte[] { JVS_READ_ANALOG, 0x03 }); // 22 = REQUEST ANALOG, 3 = 3 Channels
-            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { 0x01, (byte)InputCode.Wheel, 0x00, (byte)InputCode.Gas, 0x00, (byte)InputCode.Brake});
+            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { (byte)InputCode.AnalogBytes[0], 0x00, (byte)InputCode.AnalogBytes[2], 0x00, (byte)InputCode.AnalogBytes[4], 0x00 });
 
             // Act
             var reply = GetReply(requestBytes);
@@ -105,11 +106,11 @@ namespace DumbJvsBrain.UnitTests
             InputCode.PlayerTwoButtons.Button1 = true;
             InputCode.PlayerTwoButtons.Button4 = true;
             InputCode.PlayerOneButtons.Test = true;
-            InputCode.Wheel = 0xBA;
-            InputCode.Gas = 0xBE;
-            InputCode.Brake = 0xBE;
+            InputCode.AnalogBytes[0] = 0xBA;
+            InputCode.AnalogBytes[2] = 0xBE;
+            InputCode.AnalogBytes[4] = 0xBE;
             var requestBytes = CraftJvsPackage(1, new byte[] { JVS_READ_DIGITAL, 0x02, 0x02, JVS_READ_ANALOG, 0x03 }); // 22 = REQUEST DIGITAL, 2 = Player Count, 2 Bytes Per Player, 22 = REQUEST ANALOG, 3 = 3 Channels
-            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { 0x80, 0x02, 0x40, 0x02, 0x40, 0x01, (byte)InputCode.Wheel, 0x00, (byte)InputCode.Gas, 0x00, (byte)InputCode.Brake }); // Special Switches, P1, P1Ext, P2, P2Ext
+            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { 0x80, 0x02, 0x40, 0x02, 0x40, 0x01, (byte)InputCode.AnalogBytes[0], 0x00, (byte)InputCode.AnalogBytes[2], 0x00, (byte)InputCode.AnalogBytes[4], 0x00 }); // Special Switches, P1, P1Ext, P2, P2Ext
 
             // Act
             var reply = GetReply(requestBytes);
@@ -303,6 +304,23 @@ namespace DumbJvsBrain.UnitTests
             Assert.IsNotNull(reply);
             Assert.AreEqual(reply.Length, espectedBytes.Length);
             Assert.IsTrue(reply.SequenceEqual(espectedBytes));
+        }
+
+        [TestMethod]
+        public void JVS_GETMULTIPLEPACKAGES_ShouldReturnJVSOK_REPORTOK()
+        {
+            // Arrange
+            var requestBytes = CraftJvsPackage(1, new byte[] { 0x20, 0x02, 0x02, 0x32, 0x03, 0x00, 0x00, 0x00, 0x30, 0x01, 0xf0, 0x0d, 0x21, 0x02, 0x22, 0x08 });
+            var espectedBytes = CraftJvsPackageWithStatusAndReport(0, new byte[] { });
+
+            // Act
+            var reply = GetReply(requestBytes);
+            string str = "";
+            foreach (var b in reply)
+            {
+                str += b.ToString("X2") + " ";
+            }
+            Console.WriteLine(reply);
         }
     }
 }

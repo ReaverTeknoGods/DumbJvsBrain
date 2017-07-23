@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
@@ -25,6 +24,7 @@ namespace DumbJvsBrain.Common
             }
             return list;
         }
+
         /// <summary>
         /// Serializes SettingsData class to a SettingsData.xml file.
         /// </summary>
@@ -48,6 +48,62 @@ namespace DumbJvsBrain.Common
             using (var reader = XmlReader.Create("SettingsData.xml"))
             {
                 var joystick = (SettingsData)serializer.Deserialize(reader);
+                return joystick;
+            }
+        }
+
+        /// <summary>
+        /// Serializes JoystickMapping class to a JoystickMapping.xml file.
+        /// </summary>
+        /// <param name="joystick"></param>
+        /// <param name="playerNumber"></param>
+        public static void Serialize(JoystickMapping joystick, int playerNumber)
+        {
+            var serializer = new XmlSerializer(joystick.GetType());
+            using (var writer = XmlWriter.Create($"JoystickMapping{playerNumber}.xml"))
+            {
+                serializer.Serialize(writer, joystick);
+            }
+        }
+
+        /// <summary>
+        /// Deserializes JoystickMapping.xml to the class.
+        /// </summary>
+        /// <returns>Read JoystickMapping class.</returns>
+        public static JoystickMapping DeSerialize(int playerNumber)
+        {
+            var serializer = new XmlSerializer(typeof(JoystickMapping));
+            using (var reader = XmlReader.Create($"JoystickMapping{playerNumber}.xml"))
+            {
+                var joystick = (JoystickMapping)serializer.Deserialize(reader);
+                return joystick;
+            }
+        }
+
+        /// <summary>
+        /// Serializes JoystickMapping class to a JoystickMapping.xml file.
+        /// </summary>
+        /// <param name="joystick"></param>
+        /// <param name="playerNumber"></param>
+        public static void SerializeXInput(XInputMapping joystick, int playerNumber)
+        {
+            var serializer = new XmlSerializer(joystick.GetType());
+            using (var writer = XmlWriter.Create($"XInputMapping{playerNumber}.xml"))
+            {
+                serializer.Serialize(writer, joystick);
+            }
+        }
+
+        /// <summary>
+        /// Deserializes JoystickMapping.xml to the class.
+        /// </summary>
+        /// <returns>Read JoystickMapping class.</returns>
+        public static XInputMapping DeSerializeXInput(int playerNumber)
+        {
+            var serializer = new XmlSerializer(typeof(XInputMapping));
+            using (var reader = XmlReader.Create($"XInputMapping{playerNumber}.xml"))
+            {
+                var joystick = (XInputMapping)serializer.Deserialize(reader);
                 return joystick;
             }
         }

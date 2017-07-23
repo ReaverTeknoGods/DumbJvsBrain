@@ -55,22 +55,22 @@ namespace DumbJvsBrain.Common
                 }
                 if (key == _kbMap.P1Left)
                 {
-                    //InputCode.Wheel = pressed ? 0x20 : 0x7F;
+                    //InputCode.AnalogBytes[0] = (byte) (pressed ? 0x20 : 0x7F);
                     InputCode.PlayerOneButtons.Left = pressed;
                 }
                 if (key == _kbMap.P1Right)
                 {
-                    //InputCode.Wheel = pressed ? 0xD0 : 0x7F;
+                    //InputCode.AnalogBytes[0] = (byte) (pressed ? 0xD0 : 0x7F);
                     InputCode.PlayerOneButtons.Right = pressed;
                 }
                 if (key == _kbMap.P1Up)
                 {
-                    //InputCode.Gas = pressed ? 0xFF : 0x00;
+                    //InputCode.AnalogBytes[2] = (byte) (pressed ? 0xFF : 0x00);
                     InputCode.PlayerOneButtons.Up = pressed;
                 }
                 if (key == _kbMap.P1Down)
                 {
-                    //InputCode.Brake = pressed ? 0xFF : 0x00;
+                    //InputCode.AnalogBytes[4] = (byte) (pressed ? 0xFF : 0x00);
                     InputCode.PlayerOneButtons.Down = pressed;
                 }
                 if (key == _kbMap.P1B1)
@@ -170,22 +170,22 @@ namespace DumbJvsBrain.Common
                 }
                 if (key == Keys.Left)
                 {
-                    //InputCode.Wheel = pressed ? 0x20 : 0x7F;
+                    //InputCode.AnalogBytes[0] = (byte)(pressed ? 0x20 : 0x7F);
                     InputCode.PlayerOneButtons.Left = pressed;
                 }
                 if (key == Keys.Right)
                 {
-                    //InputCode.Wheel = pressed ? 0xD0 : 0x7F;
+                    //InputCode.AnalogBytes[0] = (byte)(pressed ? 0xD0 : 0x7F);
                     InputCode.PlayerOneButtons.Right = pressed;
                 }
                 if (key == Keys.Up)
                 {
-                    //InputCode.Gas = pressed ? 0xFF : 0x00;
+                    //InputCode.AnalogBytes[2] = (byte)(pressed ? 0xFF : 0x00);
                     InputCode.PlayerOneButtons.Up = pressed;
                 }
                 if (key == Keys.Down)
                 {
-                    //InputCode.Brake = pressed ? 0xFF : 0x00;
+                    //InputCode.AnalogBytes[4] = (byte)(pressed ? 0xFF : 0x00);
                     InputCode.PlayerOneButtons.Down = pressed;
                 }
                 if (key == Keys.Insert)

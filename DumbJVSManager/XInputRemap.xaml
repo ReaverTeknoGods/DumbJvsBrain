@@ -1,0 +1,125 @@
+﻿<Window x:Class="DumbJVSManager.XInputRemap"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Joystick Remapping" Height="640" Width="680" Closing="XInputRemap_OnClosing" Loaded="XInputRemap_OnLoaded">
+    <UniformGrid Columns="4">
+        <TextBlock>Standard Controls</TextBlock>
+        <TextBlock></TextBlock>
+        <TextBlock></TextBlock>
+        <TextBlock></TextBlock>
+        <TextBlock  Text="Start"></TextBlock>
+        <TextBox Name="TxtStart" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Up"></TextBlock>
+        <TextBox Name="TxtUp" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Down"></TextBlock>
+        <TextBox Name="TxtDown" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Left"></TextBlock>
+        <TextBox Name="TxtLeft" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Right"></TextBlock>
+        <TextBox Name="TxtRight" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Button 1"></TextBlock>
+        <TextBox Name="TxtButton1" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Button 2"></TextBlock>
+        <TextBox Name="TxtButton2" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Button 3"></TextBlock>
+        <TextBox Name="TxtButton3" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Button 4"></TextBlock>
+        <TextBox Name="TxtButton4" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Button 5"></TextBlock>
+        <TextBox Name="TxtButton5" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Button 6"></TextBlock>
+        <TextBox Name="TxtButton6" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Service"></TextBlock>
+        <TextBox Name="TxtService" IsReadOnly="true"></TextBox>
+        <TextBlock  Text="Test Switch"></TextBlock>
+        <TextBox Name="TxtTestSw" IsReadOnly="true"></TextBox>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}" Text="Sega Racing Classic"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="View Change 1" Visibility="{Binding ExtrasVisibility}" />
+        <TextBox Name="TxtSrcViewChange1" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Gear Change 1" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtSrcGearChange1" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}" />
+        <TextBlock Text="View Change 2" Visibility="{Binding ExtrasVisibility}" />
+        <TextBox Name="TxtSrcViewChange2" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Gear Change 2" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtSrcGearChange2" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="View Change 3" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtSrcViewChange3" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Gear Change 3" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtSrcGearChange3" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="View Change 4" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtSrcViewChange4" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Gear Change 4" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtSrcGearChange4" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Sega Sonic All-Stars Racing" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Item Button" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtSonicItemButton" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Initial D6AA Controls" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Shift Down" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtInitialD6ShiftDown" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Shift Up" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtInitialD6ShiftUp" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="View Change" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtInitialD6ViewChange" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Menu Up" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtInitialD6MenuUp" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Menu Down" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtInitialD6MenuDown" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Menu Left" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtInitialD6MenuLeft" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Menu Right" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtInitialD6MenuRight" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="All Wheel Controls" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Wheel Axis" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtWheel" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Gas Axis" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtGas" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Brake Axis" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBox Name="TxtBrake" IsReadOnly="true" Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Visibility="{Binding ExtrasVisibility}"/>
+        <TextBlock Text="Gun Controls"/>
+        <TextBlock/>
+        <TextBlock/>
+        <TextBlock/>
+        <TextBlock Text="Gun Up"/>
+        <TextBox Name="TxtLgiUp" IsReadOnly="true"/>
+        <TextBlock Text="Gun Down"/>
+        <TextBox Name="TxtLgiDown" IsReadOnly="true"/>
+        <TextBlock Text="Gun Left"/>
+        <TextBox Name="TxtLgiLeft" IsReadOnly="true"/>
+        <TextBlock Text="Gun Right"/>
+        <TextBox Name="TxtLgiRight" IsReadOnly="true"/>
+        <TextBlock Text="Gun Trigger"/>
+        <TextBox Name="TxtGunTrigger" IsReadOnly="true"/>
+        <TextBlock Text="Movement multiplier"/>
+        <xctk:IntegerUpDown Name="IUpDownMovementMultiplier" Value="1" Increment="1" Maximum="10" Minimum="1"/>
+        <Button Click="BtnSaveKeys" Content="Save Controls"/>
+        <Button Click="BtnCancel" Content="Cancel"/>
+    </UniformGrid>
+</Window>

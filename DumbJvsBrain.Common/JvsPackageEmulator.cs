@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using static DumbJvsBrain.Common.JvsHelper;
@@ -12,9 +10,13 @@ namespace DumbJvsBrain.Common
     {
         public byte[] Bytes { get; set; }
         public int LengthReduction { get; set; }
+
+        public bool Error { get; set; }
     }
+
     public static class JvsPackageEmulator
     {
+        private static byte[] _lastPackage;
         private static bool CompareTwoArraysGipsyWay(byte[] array1, byte[] array2, int count)
         {
             for(var i = 0; i < count; i++)
@@ -29,7 +31,7 @@ namespace DumbJvsBrain.Common
         private static byte GetSpecialBits()
         {
             byte result = 00;
-            if (InputCode.PlayerOneButtons.Test || InputCode.PlayerTwoButtons.Test)
+            if (InputCode.PlayerOneButtons.Test.HasValue && InputCode.PlayerOneButtons.Test.Value)
                 result |= 0x80;
             return result;
         }
@@ -41,21 +43,21 @@ namespace DumbJvsBrain.Common
         private static byte GetPlayer1Controls()
         {
             byte result = 0;
-            if (InputCode.PlayerOneButtons.Start)
+            if (InputCode.PlayerOneButtons.Start.HasValue && InputCode.PlayerOneButtons.Start.Value)
                 result |= 0x80;
-            if (InputCode.PlayerOneButtons.Service)
+            if (InputCode.PlayerOneButtons.Service.HasValue && InputCode.PlayerOneButtons.Service.Value)
                 result |= 0x40;
-            if (InputCode.PlayerOneButtons.Up)
+            if (InputCode.PlayerOneButtons.UpPressed())
                 result |= 0x20;
-            if (InputCode.PlayerOneButtons.Down)
+            if (InputCode.PlayerOneButtons.DownPressed())
                 result |= 0x10;
-            if (InputCode.PlayerOneButtons.Left)
+            if (InputCode.PlayerOneButtons.LeftPressed())
                 result |= 0x08;
-            if (InputCode.PlayerOneButtons.Right)
+            if (InputCode.PlayerOneButtons.RightPressed())
                 result |= 0x04;
-            if (InputCode.PlayerOneButtons.Button1)
+            if (InputCode.PlayerOneButtons.Button1.HasValue && InputCode.PlayerOneButtons.Button1.Value)
                 result |= 0x02;
-            if (InputCode.PlayerOneButtons.Button2)
+            if (InputCode.PlayerOneButtons.Button2.HasValue && InputCode.PlayerOneButtons.Button2.Value)
                 result |= 0x01;
             return result;
         }
@@ -67,13 +69,13 @@ namespace DumbJvsBrain.Common
         private static byte GetPlayer1ControlsExt()
         {
             byte result = 0;
-            if (InputCode.PlayerOneButtons.Button3)
+            if (InputCode.PlayerOneButtons.Button3.HasValue && InputCode.PlayerOneButtons.Button3.Value)
                 result |= 0x80;
-            if (InputCode.PlayerOneButtons.Button4)
+            if (InputCode.PlayerOneButtons.Button4.HasValue && InputCode.PlayerOneButtons.Button4.Value)
                 result |= 0x40;
-            if (InputCode.PlayerOneButtons.Button5)
+            if (InputCode.PlayerOneButtons.Button5.HasValue && InputCode.PlayerOneButtons.Button5.Value)
                 result |= 0x20;
-            if (InputCode.PlayerOneButtons.Button6)
+            if (InputCode.PlayerOneButtons.Button6.HasValue && InputCode.PlayerOneButtons.Button6.Value)
                 result |= 0x10;
             return result;
         }
@@ -85,21 +87,21 @@ namespace DumbJvsBrain.Common
         private static byte GetPlayer2Controls()
         {
             byte result = 0;
-            if (InputCode.PlayerTwoButtons.Start)
+            if (InputCode.PlayerTwoButtons.Start.HasValue && InputCode.PlayerTwoButtons.Start.Value)
                 result |= 0x80;
-            if (InputCode.PlayerTwoButtons.Service)
+            if (InputCode.PlayerTwoButtons.Service.HasValue && InputCode.PlayerTwoButtons.Service.Value)
                 result |= 0x40;
-            if (InputCode.PlayerTwoButtons.Up || InputCode.ShiftUp)
+            if (InputCode.PlayerTwoButtons.UpPressed())
                 result |= 0x20;
-            if (InputCode.PlayerTwoButtons.Down || InputCode.ShiftDown)
+            if (InputCode.PlayerTwoButtons.DownPressed())
                 result |= 0x10;
-            if (InputCode.PlayerTwoButtons.Left)
+            if (InputCode.PlayerTwoButtons.LeftPressed())
                 result |= 0x08;
-            if (InputCode.PlayerTwoButtons.Right)
+            if (InputCode.PlayerTwoButtons.RightPressed())
                 result |= 0x04;
-            if (InputCode.PlayerTwoButtons.Button1)
+            if (InputCode.PlayerTwoButtons.Button1.HasValue && InputCode.PlayerTwoButtons.Button1.Value)
                 result |= 0x02;
-            if (InputCode.PlayerTwoButtons.Button2)
+            if (InputCode.PlayerTwoButtons.Button2.HasValue && InputCode.PlayerTwoButtons.Button2.Value)
                 result |= 0x01;
             return result;
         }
@@ -111,13 +113,13 @@ namespace DumbJvsBrain.Common
         private static byte GetPlayer2ControlsExt()
         {
             byte result = 0;
-            if (InputCode.PlayerTwoButtons.Button3)
+            if (InputCode.PlayerTwoButtons.Button3.HasValue && InputCode.PlayerTwoButtons.Button3.Value)
                 result |= 0x80;
-            if (InputCode.PlayerTwoButtons.Button4)
+            if (InputCode.PlayerTwoButtons.Button4.HasValue && InputCode.PlayerTwoButtons.Button4.Value)
                 result |= 0x40;
-            if (InputCode.PlayerTwoButtons.Button5)
+            if (InputCode.PlayerTwoButtons.Button5.HasValue && InputCode.PlayerTwoButtons.Button5.Value)
                 result |= 0x20;
-            if (InputCode.PlayerTwoButtons.Button6)
+            if (InputCode.PlayerTwoButtons.Button6.HasValue && InputCode.PlayerTwoButtons.Button6.Value)
                 result |= 0x10;
             return result;
         }
@@ -143,23 +145,58 @@ namespace DumbJvsBrain.Common
                 case 0x15:
                     return JvsConveyMainBoardId(bytesLeft, reply);
                 case 0x20:
-                    return JvsGetDigitalReply(bytesLeft, reply);
+                    return JvsGetDigitalReply(bytesLeft, reply, multiPackage);
                 case 0x21:
-                    return JvsGetCoinReply(bytesLeft, reply);
+                    return JvsGetCoinReply(bytesLeft, reply, multiPackage);
                 case 0x22:
-                    return JvsGetAnalogReply(bytesLeft, reply);
+                    return JvsGetAnalogReply(bytesLeft, reply, multiPackage);
+                case 0x2F:
+                    return JvsReTransmitData(reply);
+                case 0x30:
+                case 0x31:
+                    return JvsGetCoinReduce(reply, multiPackage);
                 case 0x32:
-                    return JvsGeneralPurposeOutput(bytesLeft, reply);
+                    return JvsGeneralPurposeOutput(bytesLeft, reply, multiPackage);
+                case 0x37:
+                    return JvsGeneralPurposeOutput2(bytesLeft, reply, multiPackage);
             }
-            MessageBox.Show($"Unknown package, contact Reaver! Package: {ByteArrayToString(bytesLeft)}");
-            throw new NotSupportedException();
+            Console.WriteLine($"Unknown package, contact Reaver! Package: {ByteArrayToString(bytesLeft)}");
+            reply.Error = true;
+            return reply;
         }
 
-        private static JvsReply JvsGeneralPurposeOutput(byte[] bytesLeft, JvsReply reply)
+        private static JvsReply JvsReTransmitData(JvsReply reply)
+        {
+            reply.LengthReduction = 1;
+            reply.Bytes = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00};
+            return reply;
+        }
+
+        private static JvsReply JvsGetCoinReduce(JvsReply reply, bool multiPackage)
+        {
+            reply.LengthReduction = 4;
+            reply.Bytes = !multiPackage ? new byte[] { } : new byte[] { 0x03 };
+            return reply;
+        }
+
+        private static JvsReply JvsGeneralPurposeOutput(byte[] bytesLeft, JvsReply reply, bool multiPackage)
         {
             var byteCount = bytesLeft[1];
             reply.LengthReduction = byteCount + 2; // Command Code + Size + Outputs
-            reply.Bytes = new byte[] {};
+
+            // Special invalid package from Virtua-R Limit
+            //if(bytesLeft.Length > 4)
+            //    if (bytesLeft[byteCount + 2] == 0x00)
+            //        reply.LengthReduction++;
+
+            reply.Bytes = !multiPackage ? new byte[] { } : new byte[] { 0x01 };
+            return reply;
+        }
+
+        private static JvsReply JvsGeneralPurposeOutput2(byte[] bytesLeft, JvsReply reply, bool multiPackage)
+        {
+            reply.LengthReduction = 3; // Command Code + Size + Outputs
+            reply.Bytes = !multiPackage ? new byte[] { } : new byte[] { 0x01 };
             return reply;
         }
 
@@ -235,50 +272,39 @@ namespace DumbJvsBrain.Common
             return reply;
         }
 
-        private static JvsReply JvsGetAnalogReply(byte[] bytesLeft, JvsReply reply)
+        private static JvsReply JvsGetAnalogReply(byte[] bytesLeft, JvsReply reply, bool multiPackage)
         {
-            var channelCount = bytesLeft[1];
-            reply.LengthReduction = 2;
             var byteLst = new List<byte>();
-            if (channelCount != 0)
+            int channelCount = 0;
+            channelCount = bytesLeft.Length == 1 ? 8 : bytesLeft[1]; // Stupid hack for Virtua-R Limit
+            reply.LengthReduction = 2;
+
+            if (multiPackage)
+                byteLst.Add(0x01);
+            for (int i = 0; i < channelCount; i++)
             {
-                channelCount--;
-                byteLst.Add(1);
-                byteLst.Add((byte) InputCode.Wheel);
-            }
-            if (channelCount != 0)
-            {
-                channelCount--;
-                byteLst.Add(0);
-                byteLst.Add((byte) InputCode.Gas);
-            }
-            if (channelCount != 0)
-            {
-                channelCount--;
-                byteLst.Add(0);
-                byteLst.Add((byte) InputCode.Brake);
-            }
-            while (channelCount != 0)
-            {
-                channelCount--;
-                byteLst.Add(0);
-                byteLst.Add(0);
+                byteLst.Add(InputCode.AnalogBytes[(i * 2)]);
+                byteLst.Add(InputCode.AnalogBytes[(i * 2)+1]);
             }
             reply.Bytes = byteLst.ToArray();
             return reply;
         }
 
-        private static JvsReply JvsGetCoinReply(byte[] bytesLeft, JvsReply reply)
+        private static JvsReply JvsGetCoinReply(byte[] bytesLeft, JvsReply reply, bool multiPackage)
         {
             var slotCount = bytesLeft[1];
             reply.LengthReduction = 2;
-            if (slotCount == 1)
+            if (slotCount == 0)
             {
-                reply.Bytes = new byte[] {0x00, 0x00};
+                reply.Bytes = !multiPackage ? new byte[] { } : new byte[] { 0x01 };
+            }
+            else if (slotCount == 1)
+            {
+                reply.Bytes = !multiPackage ? new byte[] { 0x00, 0x00 } : new byte[] { 0x01, 0x00, 0x00 };
             }
             else if (slotCount == 2)
             {
-                reply.Bytes = new byte[] {0x00, 0x00, 0x00, 0x00};
+                reply.Bytes = !multiPackage ? new byte[] { 0x00, 0x00, 0x00, 0x00 } : new byte[] { 0x01, 0x00, 0x00, 0x00, 0x00 };
             }
             else
             {
@@ -288,11 +314,13 @@ namespace DumbJvsBrain.Common
             return reply;
         }
 
-        private static JvsReply JvsGetDigitalReply(byte[] bytesLeft, JvsReply reply)
+        private static JvsReply JvsGetDigitalReply(byte[] bytesLeft, JvsReply reply, bool multiPackage)
         {
             var byteLst = new List<byte>();
             var players = bytesLeft[1];
             var bytesToRead = bytesLeft[2];
+            if (multiPackage)
+                byteLst.Add(0x01);
             byteLst.Add(GetSpecialBits());
             if (players > 2)
             {
@@ -352,14 +380,18 @@ namespace DumbJvsBrain.Common
             for (var i = 0; i < packageSize;)
             {
                 var reply = ParsePackage(byteLst.ToArray(), multiPackage);
+                if (reply.Error)
+                    return null;
                 for (int x = 0; x < reply.LengthReduction; x++)
                 {
-                    byteLst.RemoveAt(0);
+                    if(byteLst.Count != 0)
+                        byteLst.RemoveAt(0);
                 }
                 i += reply.LengthReduction;
                 replyBytes.AddRange(reply.Bytes);
                 multiPackage = true;
             }
+            _lastPackage = replyBytes.ToArray();
             return replyBytes.ToArray();
         }
 

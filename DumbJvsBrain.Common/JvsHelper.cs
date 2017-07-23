@@ -34,23 +34,40 @@ namespace DumbJvsBrain.Common
         public const string JVS_IDENTIFIER_Sega2005Jvs14572 = "SEGA CORPORATION;I/O BD JVS;837-14572;Ver1.00;2005/10\0";
         public const string JVS_IDENTIFIER_Sega1998Jvs13551 = "SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551 ;Ver1.00;98/10\0";
         public const string JVS_IDENTIFIER_NBGI_MarioKart3 = "NBGI.;NA-JV;Ver6.01;JPN,MK3100-1-NA-APR0-A01\0";
+
         /// <summary>
         /// Calculates gas position.
         /// </summary>
         /// <param name="gas">Joystick axis value.</param>
+        /// <param name="isFullAxis">Is Full Axis.</param>
+        /// <param name="isReverseAxis">If we want to reverse the axis.</param>
         /// <returns>JVS friendly value.</returns>
-        public static int CalculateGasPos(int gas)
+        public static byte CalculateGasPos(int gas, bool isFullAxis, bool isReverseAxis)
         {
-            var value = gas / (32625 / 255);
+            var value = 0;
+            if (isFullAxis)
+            {
+                value = gas / (65535 / 255);
+            }
+            else
+            {
+                value = gas / (32767 / 255);
+            }
             if (value > 0xFF)
                 value = 0xFF;
-            return value;
+            var b = (byte) value;
+            if (isReverseAxis)
+            {
+                b = (byte) ~b;
+            }
+            return b;
         }
 
-        public static int CalculateSto0ZWheelPos(int wheel)
+        public static byte CalculateSto0ZWheelPos(int wheel, bool isXinput = false)
         {
             // DEADZONE STUFF
-
+            if(isXinput)
+                wheel += 32767; // because fuck minus
             // OFFSET VALUE FOR CALCULATIONS
             int lx = wheel - 32767;
 
@@ -77,7 +94,7 @@ namespace DumbJvsBrain.Common
                 normalizedMagnitude = 127.5;
             }
 
-            var finalMagnitude = Convert.ToInt32(normalizedMagnitude);
+            var finalMagnitude = Convert.ToByte(normalizedMagnitude);
             return finalMagnitude;
         }
 
@@ -85,11 +102,22 @@ namespace DumbJvsBrain.Common
         /// Calculates wheel position.
         /// </summary>
         /// <param name="wheel">Joystick axis value.</param>
+        /// <param name="isXinput"></param>
+        /// <param name="isSonic"></param>
         /// <returns>JVS friendly value.</returns>
-        public static int CalculateWheelPos(int wheel)
+        public static byte CalculateWheelPos(int wheel, bool isXinput = false, bool isSonic = false)
         {
-            int value = wheel / (65535 / 255);
-            return value;
+            var divider = 255;
+            if (isSonic)
+                divider = 0xD0;
+            if (isXinput)
+            {
+                wheel += 32767; // because fuck minus
+            }
+            var value = wheel / (65535 / divider);
+            if (isSonic)
+                value += 0x1D;
+            return (byte)value;
         }
 
         /// <summary>
@@ -100,6 +128,26 @@ namespace DumbJvsBrain.Common
         /// <returns>Complete JVS package.</returns>
         public static byte[] CraftJvsPackageWithStatusAndReport(byte node, byte[] bytes)
         {
+            if (bytes == null)
+            {
+                Console.WriteLine("Error sent!");
+                var errorBytes = new List<byte>
+                {
+                    JVS_SYNC_CODE,
+                    node,
+                    0x09,
+                    JVS_STATUS_UNKNOWN,
+                    JVS_REPORT_OK,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x01,
+                    0x0D
+                };
+                return errorBytes.ToArray();
+            }
             var packageBytes = new List<byte>
             {
                 JVS_SYNC_CODE,

@@ -5,19 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DumbJVSManager"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="Dumb JVS Manager 0.4" Height="500" Width="640" Loaded="Window_Loaded" Closing="MainWindow_OnClosing">
+        Title="Dumb JVS Manager 0.8" Height="560" Width="640" Loaded="Window_Loaded" Closing="MainWindow_OnClosing">
     <Grid>
         <StackPanel>
-            <Image Source="Resources/teknoparrot_by_pooterman-db9erxd.png" MaxWidth="400" MaxHeight="350"/>
+            <TextBlock HorizontalAlignment="Center">
+                <Hyperlink 
+                    RequestNavigate="Hyperlink_OnRequestNavigate">
+                    TeknoGods.com proudly presents
+                </Hyperlink>
+            </TextBlock>
+            <Image Source="Resources/teknoparrot_by_pooterman-db9erxd.png" MaxWidth="400" MaxHeight="350" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
             <TextBlock HorizontalAlignment="Center" Text="Game launcher"/>
             <ComboBox Name="GameListComboBox" SelectedIndex="0" HorizontalContentAlignment="Center">
-                <ComboBoxItem Content="Melty Blood Actress Again Current Code"/>
-                <ComboBoxItem Content="Sega Racing Classic"/>
-                <ComboBoxItem Content="Virtua Tennis 4"/>
+                <ComboBoxItem Content="Initial D6AA" Tag="8"/>
+                <ComboBoxItem Content="Let's Go Island" Tag="0"/>
+                <ComboBoxItem Content="Melty Blood Actress Again Current Code" Tag="1"/>
+                <ComboBoxItem Content="Sega Dream Raiders" Tag="7"/>
+                <ComboBoxItem Content="Sega Golden Gun" Tag="9"/>
+                <ComboBoxItem Content="Sega Racing Classic" Tag="2"/>
+                <ComboBoxItem Content="Sega Sonic All-Stars Racing Arcade" Tag="6"/>
+                <ComboBoxItem Content="Virtua Tennis 4" Tag="3"/>
             </ComboBox>
             <CheckBox Name="ChkTestMenu" Content="Test menu" Width="80"/>
             <Button Click="BtnStartGame" Content="Start Game" Width="Auto"/>
             <Button Click="BtnSettings" Content="Settings"/>
+            <Button Click="BtnAbout" Content="About"></Button>
+            <Button Click="BtnHelp" Content="Help"></Button>
             <Button Click="BtnQuit" Content="Quit"/>
         </StackPanel>
     </Grid>

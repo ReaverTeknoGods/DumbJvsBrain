@@ -18,6 +18,7 @@ namespace DumbJVSManager
     public partial class EditGamesWindow : Window
     {
         private SettingsData _settingsData;
+        private bool _xinputMode;
         public EditGamesWindow(SettingsData settingsData)
         {
             InitializeComponent();
@@ -31,7 +32,14 @@ namespace DumbJVSManager
             TxtSrcLocation.Text = _settingsData.SegaRacingClassicDir;
             TxtVt4Location.Text = _settingsData.VirtuaTennis4Dir;
             TxtMeltyBloodLocation.Text = _settingsData.MeltyBloodDir;
+            TxtLgiLocation.Text = _settingsData.LgiDir;
             ChkUseSto0ZCheckBox.IsChecked = _settingsData.UseSto0ZDrivingHack;
+            TxtSegaSonicLocation.Text = _settingsData.SegaSonicDir;
+            ChkUseMouse.IsChecked = _settingsData.UseMouse;
+            TxtSdrLocation.Text = _settingsData.SegaDreamRaidersDir;
+            TxtGoldenGunLocation.Text = _settingsData.GoldenGunDir;
+            TxtInitialD6Location.Text = _settingsData.InitialD6Dir;
+            CmbJoystickInterface.SelectedIndex = _settingsData.XInputMode ? 1 : 0;
         }
 
         private void BtnHelpJvs(object sender, RoutedEventArgs e)
@@ -111,7 +119,14 @@ namespace DumbJVSManager
                     SegaRacingClassicDir = TxtSrcLocation.Text,
                     VirtuaTennis4Dir = TxtVt4Location.Text,
                     MeltyBloodDir = TxtMeltyBloodLocation.Text,
-                    UseSto0ZDrivingHack = ChkUseSto0ZCheckBox.IsChecked != null && ChkUseSto0ZCheckBox.IsChecked.Value
+                    LgiDir = TxtLgiLocation.Text,
+                    SegaSonicDir = TxtSegaSonicLocation.Text,
+                    SegaDreamRaidersDir = TxtSdrLocation.Text,
+                    UseSto0ZDrivingHack = ChkUseSto0ZCheckBox.IsChecked != null && ChkUseSto0ZCheckBox.IsChecked.Value,
+                    UseMouse = ChkUseMouse.IsChecked != null && ChkUseMouse.IsChecked.Value,
+                    InitialD6Dir = TxtInitialD6Location.Text,
+                    XInputMode = _xinputMode,
+                    GoldenGunDir = TxtGoldenGunLocation.Text
                 };
                 JoystickHelper.Serialize(settingsData);
                 _settingsData = settingsData;
@@ -237,8 +252,68 @@ namespace DumbJVSManager
 
         private void BtnKeyboardRemap_OnClick(object sender, RoutedEventArgs e)
         {
-            KeyboardRemap remap = new KeyboardRemap();
+            var remap = new KeyboardRemap();
             remap.ShowDialog();
+        }
+
+        private void BtnRemapJoysticks(object sender, RoutedEventArgs e)
+        {
+            if (!_settingsData.XInputMode)
+            {
+                if (_settingsData.PlayerOneGuid == Guid.Empty)
+                {
+                    MessageBox.Show("Please save your selected joystick first.", "Information", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    return;
+                }
+                var remap = new DirectInputRemap(_settingsData, true, 1);
+                remap.ShowDialog();
+                return;
+            }
+            var xremap = new XInputRemap(true, 1);
+            xremap.ShowDialog();
+        }
+
+        private void BtnRemapJoysticks2(object sender, RoutedEventArgs e)
+        {
+            if (!_settingsData.XInputMode)
+            {
+                if (_settingsData.PlayerOneGuid == Guid.Empty)
+                {
+                    MessageBox.Show("Please save your selected joystick first.", "Information", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    return;
+                }
+                var remap = new DirectInputRemap(_settingsData, false, 2);
+                remap.ShowDialog();
+                return;
+            }
+            var xremap = new XInputRemap(false, 2);
+            xremap.ShowDialog();
+        }
+
+        private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (((ComboBox) e.Source).SelectedIndex == 0)
+            {
+                P1JoystickLabel.Visibility = Visibility.Visible;
+                P1JoystickComboBox.Visibility = Visibility.Visible;
+                P2JoystickLabel.Visibility = Visibility.Visible;
+                P2JoystickComboBox.Visibility = Visibility.Visible;
+                BtnJoystickRefresh.Visibility = Visibility.Visible;
+                _xinputMode = false;
+                _settingsData.XInputMode = false;
+            }
+            if (((ComboBox) e.Source).SelectedIndex == 1)
+            {
+                P1JoystickLabel.Visibility = Visibility.Collapsed;
+                P1JoystickComboBox.Visibility = Visibility.Collapsed;
+                P2JoystickLabel.Visibility = Visibility.Collapsed;
+                P2JoystickComboBox.Visibility = Visibility.Collapsed;
+                BtnJoystickRefresh.Visibility = Visibility.Collapsed;
+                _xinputMode = true;
+                _settingsData.XInputMode = true;
+            }
         }
     }
 }
