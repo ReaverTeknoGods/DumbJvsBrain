@@ -185,9 +185,7 @@ namespace DumbJVSManager
         private void BtnSettings(object sender, RoutedEventArgs e)
         {
             _settingsWindow.ShowDialog();
-            MessageBox.Show("Settings saved, please restart me.", "Success", MessageBoxButton.OK,
-                MessageBoxImage.Information);
-            Application.Current.Shutdown(0);
+            LoadSettingsData();
         }
 
         private void BtnQuit(object sender, RoutedEventArgs e)
